@@ -3,7 +3,11 @@
 	"version": "0.1.0",
 	"description": "Pikaboo design system tokens, themes, and React components.",
 	"type": "module",
-	"private": true,
+	"private": false,
+	"publishConfig": {
+		"access": "restricted",
+		"registry": "https://timbuk2-539247467239.d.codeartifact.af-south-1.amazonaws.com/npm/timbuk2/"
+	},
 	"engines": {
 		"node": ">=24.0.0",
 		"npm": ">=10.9.0"
@@ -23,10 +27,25 @@
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		},
+		"./auth": {
+			"types": "./dist/auth.d.ts",
+			"import": "./dist/auth.js",
+			"require": "./dist/auth.cjs"
+		},
+		"./report": {
+			"types": "./dist/report.d.ts",
+			"import": "./dist/report.js",
+			"require": "./dist/report.cjs"
+		},
 		"./tailwind": {
 			"types": "./dist/tailwind.d.ts",
 			"import": "./dist/tailwind.js",
 			"require": "./dist/tailwind.cjs"
+		},
+		"./theme": {
+			"types": "./dist/theme.d.ts",
+			"import": "./dist/theme.js",
+			"require": "./dist/theme.cjs"
 		},
 		"./styles.css": "./dist/styles.css"
 	},
@@ -35,6 +54,12 @@
 		"storybook": "storybook dev -p 2050 --host 127.0.0.1 --no-open",
 		"build-storybook": "storybook build",
 		"build": "vite build",
+		"build:package": "npm run type-check && npm run check && npm test && npm run build",
+		"prepublishOnly": "npm run build:package",
+		"pack:check": "npm_config_cache=/private/tmp/pds-npm-cache npm pack --dry-run",
+		"artifact:login": "aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository timbuk2 --region af-south-1",
+		"publish:artifact:dry-run": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --dry-run --access restricted",
+		"publish:artifact": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --access restricted",
 		"lint": "biome lint --error-on-warnings",
 		"format": "biome format --write",
 		"check": "biome check",

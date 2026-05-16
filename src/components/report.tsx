@@ -1664,6 +1664,7 @@ export function ReportPlacementTable({
 									onRowSelect(row, index);
 								}
 							}}
+							role={onRowSelect ? 'button' : undefined}
 							tabIndex={onRowSelect ? 0 : undefined}
 						>
 							<td>

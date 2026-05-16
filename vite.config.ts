@@ -11,6 +11,8 @@ export default defineConfig({
 				'src/**/*.stories.tsx',
 				'src/**/*.test.ts',
 				'src/**/*.test.tsx',
+				'vite.config.ts',
+				'vitest.config.ts',
 			],
 			insertTypesEntry: true,
 		}),
@@ -19,8 +21,11 @@ export default defineConfig({
 		cssCodeSplit: false,
 		lib: {
 			entry: {
+				auth: resolve(__dirname, 'src/auth.ts'),
 				index: resolve(__dirname, 'src/index.ts'),
+				report: resolve(__dirname, 'src/report.ts'),
 				tailwind: resolve(__dirname, 'src/tailwind.ts'),
+				theme: resolve(__dirname, 'src/theme.ts'),
 			},
 			formats: ['es', 'cjs'],
 			fileName: (format, entryName) =>
@@ -30,6 +35,7 @@ export default defineConfig({
 		rollupOptions: {
 			external: ['react', 'react-dom', 'react/jsx-runtime'],
 			output: {
+				exports: 'named',
 				globals: {
 					react: 'React',
 					'react-dom': 'ReactDOM',

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Surface } from '../components';
 import { ThemeProvider, useTheme } from './theme-provider';
 import { ThemeSwitcher } from './theme-switcher';
-import type { ThemeId } from './tokens';
+import { resolveThemeId, type ThemeId } from './tokens';
 
 const meta = {
 	title: 'Foundations/Theme Switcher',
@@ -38,7 +38,10 @@ export const Controlled: Story = {
 		const [themeId, setThemeId] = useState<ThemeId>('pikaboo');
 
 		return (
-			<ThemeProvider onThemeChange={setThemeId} theme={themeId}>
+			<ThemeProvider
+				onThemeChange={(nextThemeId) => setThemeId(resolveThemeId(nextThemeId))}
+				theme={themeId}
+			>
 				<ThemeSwitcherDemo />
 			</ThemeProvider>
 		);

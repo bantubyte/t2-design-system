@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+	createDesignTheme,
 	defaultThemeId,
 	getProductName,
 	getThemeById,
 	getThemeCssVariables,
 	getThemeDataAttributes,
+	isDesignTheme,
+	resolveTheme,
 	resolveThemeId,
 	themeIds,
 } from './tokens';
@@ -56,6 +59,34 @@ describe('theme contract', () => {
 		expect(getThemeDataAttributes('primedia')).toEqual({
 			'data-brand': 'pikaboo',
 			'data-theme': 'primedia',
+		});
+	});
+
+	it('can create and resolve a custom tenant theme from an existing base theme', () => {
+		const demoTheme = createDesignTheme({
+			id: 'demo',
+			baseTheme: 'primedia',
+			copy: {
+				productName: 'Demo Intelligence',
+				poweredByLabel: 'Powered by Demo Intelligence',
+			},
+			colors: {
+				primary: '#123456',
+				secondary: '#654321',
+			},
+		});
+
+		expect(isDesignTheme(demoTheme)).toBe(true);
+		expect(resolveTheme(demoTheme).id).toBe('demo');
+		expect(getThemeDataAttributes(demoTheme)).toEqual({
+			'data-brand': 'pikaboo',
+			'data-theme': 'demo',
+		});
+		expect(getProductName(demoTheme)).toBe('Demo Intelligence');
+		expect(getThemeCssVariables(demoTheme)).toMatchObject({
+			'--theme-primary': '#123456',
+			'--theme-primary-rgb': '18 52 86',
+			'--theme-secondary': '#654321',
 		});
 	});
 });

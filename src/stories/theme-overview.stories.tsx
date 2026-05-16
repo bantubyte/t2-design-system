@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { Button, Surface } from '../components';
-import { ThemeProvider, ThemeSwitcher, useTheme } from '../theme';
+import {
+	createDesignTheme,
+	ThemeProvider,
+	ThemeSwitcher,
+	useTheme,
+} from '../theme';
 
 const meta = {
 	title: 'Foundations/Theme Overview',
@@ -140,5 +145,66 @@ export const TenantComparison: Story = {
 				</ThemeProvider>
 			</div>
 		</div>
+	),
+};
+
+const demoTheme = createDesignTheme({
+	id: 'demo',
+	name: 'Demo Tenant',
+	baseTheme: 'primedia',
+	copy: {
+		productName: 'Demo Intelligence',
+		tenantName: 'Demo Tenant',
+		reportTitle: 'Demo Campaign Report',
+		poweredByLabel: 'Powered by Demo Intelligence',
+	},
+	colors: {
+		primary: '#123456',
+		primaryHover: '#0d2a45',
+		secondary: '#2f6f73',
+		accent: '#d8ff45',
+		accentForeground: '#123456',
+		foreground: '#0d2238',
+	},
+});
+
+export const CustomThemeFactory: Story = {
+	parameters: {
+		docs: {
+			source: {
+				code: `import { createDesignTheme, ThemeProvider, ThemeSwitcher } from '@pikaboo/web-design-system/theme';
+
+const demoTheme = createDesignTheme({
+  id: 'demo',
+  baseTheme: 'primedia',
+  copy: {
+    productName: 'Demo Intelligence',
+    tenantName: 'Demo Tenant',
+  },
+  colors: {
+    primary: '#123456',
+    secondary: '#2f6f73',
+    accent: '#d8ff45',
+  },
+});
+
+<ThemeProvider theme={demoTheme}>
+  <ThemeSwitcher options={['pikaboo', 'primedia', demoTheme]} />
+  <YourApp />
+</ThemeProvider>`,
+			},
+		},
+	},
+	render: () => (
+		<ThemeProvider defaultTheme={demoTheme}>
+			<main className="pds-story-frame">
+				<ThemeSwitcher
+					options={['pikaboo' as const, 'primedia' as const, demoTheme]}
+				/>
+				<div style={{ marginTop: '2rem' }}>
+					<ThemeComparisonPanel />
+				</div>
+			</main>
+		</ThemeProvider>
 	),
 };

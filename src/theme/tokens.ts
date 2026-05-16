@@ -1,8 +1,12 @@
 export const themeIds = ['pikaboo', 'primedia'] as const;
 
 export type ThemeId = (typeof themeIds)[number];
-export type ThemeInput = ThemeId | 'cortexx' | (string & {});
-export type ThemeTenant = ThemeId;
+export type ThemeTenant = ThemeId | (string & {});
+export type ThemeInput =
+	| ThemeId
+	| 'cortexx'
+	| DesignTheme<string>
+	| (string & {});
 export type ThemeCssVariables = Record<`--${string}`, string>;
 
 export interface ThemeCopyTokens {
@@ -67,8 +71,8 @@ export interface ThemeChartTokens {
 	grid: string;
 }
 
-export interface DesignTheme {
-	id: ThemeId;
+export interface DesignTheme<TId extends string = ThemeId> {
+	id: TId;
 	name: string;
 	description: string;
 	tenant: ThemeTenant;
@@ -81,7 +85,120 @@ export interface DesignTheme {
 	cssVariables: ThemeCssVariables;
 }
 
+export type AnyDesignTheme = DesignTheme<string>;
+
+export interface ThemeTokenOverrides {
+	charts?: Partial<ThemeChartTokens>;
+	colors?: Partial<ThemeColorTokens>;
+	copy?: Partial<ThemeCopyTokens>;
+	cssVariables?: Partial<ThemeCssVariables>;
+	shadows?: Partial<ThemeShadowTokens>;
+	typography?: Partial<ThemeTypographyTokens>;
+}
+
+export interface CreateDesignThemeOptions<TId extends string>
+	extends ThemeTokenOverrides {
+	aliases?: readonly string[];
+	baseTheme?: ThemeInput;
+	description?: string;
+	id: TId;
+	name?: string;
+	tenant?: ThemeTenant;
+}
+
 export const defaultThemeId: ThemeId = 'pikaboo';
+
+const hexToRgbTriplet = (value?: string): string | undefined => {
+	const match = value?.trim().match(/^#(?<hex>[0-9a-f]{6})$/i);
+	const hex = match?.groups?.hex;
+	if (!hex) return undefined;
+
+	const red = Number.parseInt(hex.slice(0, 2), 16);
+	const green = Number.parseInt(hex.slice(2, 4), 16);
+	const blue = Number.parseInt(hex.slice(4, 6), 16);
+	return `${red} ${green} ${blue}`;
+};
+
+const cssVariablesFromTokenOverrides = ({
+	charts,
+	colors,
+	shadows,
+	typography,
+}: ThemeTokenOverrides): ThemeCssVariables => {
+	const variables: ThemeCssVariables = {};
+	const setVariable = (name: `--${string}`, value?: string) => {
+		if (value) {
+			variables[name] = value;
+		}
+	};
+
+	setVariable('--theme-font-body', typography?.body);
+	setVariable('--theme-font-heading', typography?.heading);
+	setVariable('--theme-font-ui', typography?.ui);
+
+	setVariable('--theme-page-bg', colors?.background);
+	setVariable('--theme-bg-muted', colors?.backgroundMuted);
+	setVariable('--theme-surface', colors?.surface);
+	setVariable('--theme-surface-elevated', colors?.surfaceElevated);
+	setVariable('--theme-foreground', colors?.foreground);
+	setVariable('--theme-foreground-muted', colors?.foregroundMuted);
+	setVariable('--theme-foreground-subtle', colors?.foregroundSubtle);
+	setVariable('--theme-primary', colors?.primary);
+	setVariable('--theme-primary-hover', colors?.primaryHover);
+	setVariable('--theme-primary-foreground', colors?.primaryForeground);
+	setVariable('--theme-secondary', colors?.secondary);
+	setVariable('--theme-accent', colors?.accent);
+	setVariable('--theme-accent-foreground', colors?.accentForeground);
+	setVariable('--theme-border', colors?.border);
+	setVariable('--theme-ring', colors?.ring);
+	setVariable('--theme-info', colors?.info);
+	setVariable('--theme-link', colors?.link);
+	setVariable('--theme-link-hover', colors?.linkHover);
+	setVariable('--theme-success', colors?.success);
+	setVariable('--theme-warning', colors?.warning);
+	setVariable('--theme-danger', colors?.danger);
+	setVariable('--theme-brand-magenta', colors?.magenta);
+	setVariable('--theme-brand-cyan', colors?.cyan);
+	setVariable('--theme-brand-text', colors?.slate);
+	setVariable('--theme-brand-surface', colors?.pearl);
+	setVariable('--theme-primary-rgb', hexToRgbTriplet(colors?.primary));
+	setVariable('--theme-secondary-rgb', hexToRgbTriplet(colors?.secondary));
+	setVariable('--theme-foreground-rgb', hexToRgbTriplet(colors?.foreground));
+
+	setVariable('--theme-shadow-sm', shadows?.sm);
+	setVariable('--theme-shadow-md', shadows?.md);
+	setVariable('--theme-shadow-lg', shadows?.lg);
+	setVariable('--theme-shadow-card', shadows?.card);
+	setVariable('--theme-brand-glow', shadows?.glow);
+
+	setVariable('--theme-chart-primary', charts?.primary);
+	setVariable('--theme-chart-secondary', charts?.secondary);
+	setVariable('--theme-chart-tertiary', charts?.tertiary);
+	setVariable('--theme-chart-quaternary', charts?.quaternary);
+	setVariable('--theme-chart-quinary', charts?.quinary);
+	setVariable('--theme-chart-senary', charts?.senary);
+	setVariable('--theme-chart-axis', charts?.axis);
+	setVariable('--theme-chart-grid', charts?.grid);
+
+	return variables;
+};
+
+const mergeCssVariables = (
+	...sets: readonly (Partial<ThemeCssVariables> | undefined)[]
+): ThemeCssVariables => {
+	const variables: ThemeCssVariables = {};
+
+	for (const set of sets) {
+		if (!set) continue;
+		for (const [name, value] of Object.entries(set)) {
+			if (typeof value === 'string') {
+				variables[name as `--${string}`] = value;
+			}
+		}
+	}
+
+	return variables;
+};
 
 const pikabooCssVariables = {
 	'--theme-font-body': 'Helvetica Neue, Helvetica, Arial, sans-serif',
@@ -379,15 +496,32 @@ const themes = {
 		},
 		cssVariables: primediaCssVariables,
 	},
-} satisfies Record<ThemeId, DesignTheme>;
+} satisfies Record<ThemeId, DesignTheme<ThemeId>>;
 
-export const designThemes: Readonly<Record<ThemeId, DesignTheme>> = themes;
+export const designThemes: Readonly<Record<ThemeId, DesignTheme<ThemeId>>> =
+	themes;
+
+export const isDesignTheme = (value: unknown): value is AnyDesignTheme => {
+	if (!value || typeof value !== 'object') return false;
+	const theme = value as Partial<AnyDesignTheme>;
+	return Boolean(
+		theme.id &&
+			typeof theme.id === 'string' &&
+			theme.copy &&
+			theme.colors &&
+			theme.cssVariables,
+	);
+};
 
 export const isThemeId = (value: unknown): value is ThemeId =>
 	typeof value === 'string' &&
 	(themeIds as readonly string[]).includes(value.trim().toLowerCase());
 
 export const resolveThemeId = (themeId?: unknown): ThemeId => {
+	if (isDesignTheme(themeId)) {
+		return isThemeId(themeId.id) ? themeId.id : defaultThemeId;
+	}
+
 	if (typeof themeId !== 'string') return defaultThemeId;
 
 	const normalizedThemeId = themeId.trim().toLowerCase();
@@ -401,31 +535,34 @@ export const resolveThemeId = (themeId?: unknown): ThemeId => {
 export const getThemeById = (themeId?: unknown): DesignTheme =>
 	designThemes[resolveThemeId(themeId)];
 
+export const resolveTheme = (theme?: unknown): AnyDesignTheme =>
+	isDesignTheme(theme) ? theme : getThemeById(theme);
+
 export const getThemeCopy = (themeId?: unknown): ThemeCopyTokens =>
-	getThemeById(themeId).copy;
+	resolveTheme(themeId).copy;
 
 export const getProductName = (themeId?: unknown): string =>
 	getThemeCopy(themeId).productName;
 
 export const getThemeCssVariables = (themeId?: unknown): ThemeCssVariables => ({
-	...getThemeById(themeId).cssVariables,
+	...resolveTheme(themeId).cssVariables,
 });
 
 export const getThemeDataAttributes = (
 	themeId?: unknown,
 ): {
 	'data-brand': 'pikaboo';
-	'data-theme': ThemeId;
+	'data-theme': string;
 } => ({
 	'data-brand': 'pikaboo',
-	'data-theme': resolveThemeId(themeId),
+	'data-theme': resolveTheme(themeId).id,
 });
 
 export const applyThemeToElement = (
 	element: HTMLElement,
 	themeId?: unknown,
-): DesignTheme => {
-	const theme = getThemeById(themeId);
+): AnyDesignTheme => {
+	const theme = resolveTheme(themeId);
 	element.dataset.brand = 'pikaboo';
 	element.dataset.theme = theme.id;
 
@@ -434,4 +571,61 @@ export const applyThemeToElement = (
 	}
 
 	return theme;
+};
+
+export const createDesignTheme = <TId extends string>({
+	aliases = [],
+	baseTheme = defaultThemeId,
+	charts,
+	colors,
+	copy,
+	cssVariables,
+	description,
+	id,
+	name,
+	shadows,
+	tenant,
+	typography,
+}: CreateDesignThemeOptions<TId>): DesignTheme<TId> => {
+	const base = resolveTheme(baseTheme);
+	const displayName = name ?? id;
+
+	return {
+		...base,
+		id,
+		name: displayName,
+		description: description ?? `${displayName} tenant theme.`,
+		tenant: tenant ?? id,
+		aliases: [...aliases],
+		copy: {
+			...base.copy,
+			...copy,
+		},
+		typography: {
+			...base.typography,
+			...typography,
+		},
+		colors: {
+			...base.colors,
+			...colors,
+		},
+		shadows: {
+			...base.shadows,
+			...shadows,
+		},
+		charts: {
+			...base.charts,
+			...charts,
+		},
+		cssVariables: mergeCssVariables(
+			base.cssVariables,
+			cssVariablesFromTokenOverrides({
+				charts,
+				colors,
+				shadows,
+				typography,
+			}),
+			cssVariables,
+		),
+	};
 };

@@ -2,18 +2,20 @@ import type { FieldsetHTMLAttributes } from 'react';
 import { cx } from '../utils/class-names';
 import { useTheme } from './theme-provider';
 import {
-	getThemeById,
-	resolveThemeId,
+	type AnyDesignTheme,
+	resolveTheme,
 	type ThemeId,
 	type ThemeInput,
 	themeIds,
 } from './tokens';
 
+export type ThemeSwitcherOption = ThemeId | AnyDesignTheme;
+
 export interface ThemeSwitcherProps
 	extends FieldsetHTMLAttributes<HTMLFieldSetElement> {
 	value?: ThemeInput;
-	onThemeChange?: (themeId: ThemeId) => void;
-	options?: readonly ThemeId[];
+	onThemeChange?: (themeId: string, theme: AnyDesignTheme) => void;
+	options?: readonly ThemeSwitcherOption[];
 	label?: string;
 }
 
@@ -26,23 +28,23 @@ export function ThemeSwitcher({
 	...props
 }: ThemeSwitcherProps) {
 	const context = useTheme();
-	const selectedThemeId = resolveThemeId(value ?? context.themeId);
+	const selectedThemeId = resolveTheme(value ?? context.theme).id;
 
 	return (
 		<fieldset className={cx('pds-theme-switcher', className)} {...props}>
 			<legend className="pds-visually-hidden">{label}</legend>
-			{options.map((themeId) => {
-				const theme = getThemeById(themeId);
-				const isSelected = themeId === selectedThemeId;
+			{options.map((option) => {
+				const theme = resolveTheme(option);
+				const isSelected = theme.id === selectedThemeId;
 
 				return (
 					<button
 						aria-pressed={isSelected}
 						className="pds-theme-switcher__option"
-						key={themeId}
+						key={theme.id}
 						onClick={() => {
-							context.setTheme(themeId);
-							onThemeChange?.(themeId);
+							context.setTheme(option);
+							onThemeChange?.(theme.id, theme);
 						}}
 						title={
 							theme.tenant

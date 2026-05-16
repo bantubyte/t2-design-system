@@ -10,20 +10,18 @@ import {
 } from 'react';
 import { cx } from '../utils/class-names';
 import {
-	type DesignTheme,
+	type AnyDesignTheme,
 	defaultThemeId,
 	designThemes,
-	getThemeById,
 	getThemeCssVariables,
 	getThemeDataAttributes,
-	resolveThemeId,
-	type ThemeId,
+	resolveTheme,
 	type ThemeInput,
 } from './tokens';
 
 export interface ThemeContextValue {
-	themeId: ThemeId;
-	theme: DesignTheme;
+	themeId: string;
+	theme: AnyDesignTheme;
 	setTheme: (themeId: ThemeInput) => void;
 }
 
@@ -36,7 +34,7 @@ const ThemeContext = createContext<ThemeContextValue>({
 export interface ThemeProviderProps extends PropsWithChildren {
 	theme?: ThemeInput;
 	defaultTheme?: ThemeInput;
-	onThemeChange?: (themeId: ThemeId, theme: DesignTheme) => void;
+	onThemeChange?: (themeId: string, theme: AnyDesignTheme) => void;
 	applyToRoot?: boolean;
 	className?: string;
 	style?: CSSProperties;
@@ -51,19 +49,18 @@ export function ThemeProvider({
 	style,
 	children,
 }: ThemeProviderProps) {
-	const [uncontrolledTheme, setUncontrolledTheme] = useState<ThemeId>(() =>
-		resolveThemeId(defaultTheme),
-	);
-	const themeId = resolveThemeId(theme ?? uncontrolledTheme);
-	const activeTheme = getThemeById(themeId);
+	const [uncontrolledTheme, setUncontrolledTheme] =
+		useState<ThemeInput>(defaultTheme);
+	const activeTheme = resolveTheme(theme ?? uncontrolledTheme);
+	const themeId = activeTheme.id;
 
 	const setTheme = useCallback(
 		(nextTheme: ThemeInput) => {
-			const nextThemeId = resolveThemeId(nextTheme);
+			const nextActiveTheme = resolveTheme(nextTheme);
 			if (theme === undefined) {
-				setUncontrolledTheme(nextThemeId);
+				setUncontrolledTheme(nextTheme);
 			}
-			onThemeChange?.(nextThemeId, getThemeById(nextThemeId));
+			onThemeChange?.(nextActiveTheme.id, nextActiveTheme);
 		},
 		[onThemeChange, theme],
 	);
