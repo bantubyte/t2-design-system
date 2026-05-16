@@ -40,7 +40,8 @@
 		"check": "biome check",
 		"check:fix": "biome check --write",
 		"type-check": "tsc --noEmit",
-		"test": "vitest run"
+		"test": "vitest run",
+		"init-timbuk2-npm": "sh -c 'AWS_PROFILE=\"${1:?Usage: npm run init-timbuk2-npm <AWS_PROFILE>}\" exec aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region af-south-1' init-timbuk2-npm"
 	},
 	"peerDependencies": {
 		"react": "^18.3.0 || ^19.0.0",

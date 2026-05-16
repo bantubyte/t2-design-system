@@ -17,6 +17,17 @@ npm run build
 npm run build-storybook
 ```
 
+## CodeArtifact npm registry
+
+`npm install` resolves against the **timbuk2** CodeArtifact registry in af-south-1 (proxies `npmjs.org` + hosts internal packages). The auth token lasts 12 hours — re-run when you start hitting 401s on install:
+
+```bash
+npm run init-timbuk2-npm <AWS_PROFILE>
+# e.g. npm run init-timbuk2-npm 539247467239_AdministratorAccess
+```
+
+The script rewrites `~/.npmrc` with a fresh token. Same command works in the monorepo root and every other JS sub-repo.
+
 ## Package Usage
 
 ```tsx
