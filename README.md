@@ -19,7 +19,7 @@ npm run build-storybook
 
 ## CodeArtifact npm registry
 
-`npm install` resolves against the **timbuk2** CodeArtifact registry in af-south-1 (proxies `npmjs.org` + hosts internal packages). The auth token lasts 12 hours — re-run when you start hitting 401s on install:
+`npm install` resolves against the **timbuk2** CodeArtifact registry in eu-west-1 (CodeArtifact has no af-south-1 service endpoint). It proxies `npmjs.org` and hosts internal packages. The auth token lasts 12 hours — re-run when you start hitting 401s on install:
 
 ```bash
 npm run init-timbuk2-npm <AWS_PROFILE>
