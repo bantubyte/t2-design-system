@@ -67,6 +67,20 @@ npm_config_cache=/private/tmp/pds-npm-cache npm pack --dry-run
 npm_config_cache=/private/tmp/pds-npm-cache npm publish --access restricted
 ```
 
+## Storybook Manual
+
+Storybook is the living usage manual for the package:
+
+- `Documentation/Component Usage` is the searchable catalog. It lists component
+  families, package entrypoints, key props, React snippets, and raw JSX snippets
+  where raw adapters exist.
+- `Documentation/Interactive Playgrounds` groups the main component families
+  into controllable prop playgrounds.
+- `Documentation/Plain JSX Exports` renders the raw auth and report JSX
+  entrypoints as generated HTML, so consumers can see the non-React surface.
+- `Components/Floating Button` documents the generic draggable floating action
+  button used for help, quick-create, export, or any persistent action.
+
 Consumer projects should authenticate to the same CodeArtifact repository, then
 install the package normally:
 
@@ -214,11 +228,12 @@ export function App() {
   `Textarea`, `Switch`, `Slider`, `RadioCardGroup`, `Popover`,
   `DropdownMenu`, `DropdownItem`, `CommandMenu`, `SelectorGroup`,
   `SelectorOption`, `SearchableSelector`, `SegmentedControl`, `Calendar`,
-  `DateRangePicker`, `TabList`, `Tab`, `Tabs`, `Accordion`,
+  `DateRangePicker`, `FloatingButton`, `TabList`, `Tab`, `Tabs`, `Accordion`,
   `DisclosureButton`, `FileDropzone`, `Tooltip`, `Divider`.
 - Layout: `Container`, `Grid`, `GridItem`, `Stack`, `Cluster`, `PageShell`,
   `SectionHeader`, `Toolbar`, `Breadcrumbs`, `Pagination`.
-- Feedback: `Alert`, `Dialog`, `EmptyState`, `LoadingState`, `Progress`,
+- Feedback: `Alert`, `Dialog`, `EmptyState`, `LoadingState`, `BigLoader`,
+  `ContentLoader`, `CardLoadingState`, `PageContentLoader`, `Progress`,
   `Skeleton`, `GuidedWizardShell`, `GuidedWizardStepper`.
 - Data: `MetricCard`, `StatGrid`, `DataTable`, `ChartCard`, `InsightCard`.
 - Campaign patterns: `CampaignStatCard`, `CampaignListToolbar`,
@@ -232,7 +247,8 @@ export function App() {
   `ReportBlock`, `ReportBlockGrid`, `ReportMetricBlock`,
   `ReportMetricRibbon`, `ReportMetricRibbonLoading`, `ReportMetricTile`,
   `ReportTourCallout`, `ReportEntityCard`, `ReportEmptyPanel`,
-  `ReportChartLoadingBlock`, `ReportRankedListBlock`, `ReportToggleGroup`,
+  `ReportChartLoadingBlock`, `ReportSectionLoadingState`,
+  `ReportPageLoadingState`, `ReportRankedListBlock`, `ReportToggleGroup`,
   `ReportActionCard`, `ReportEvidenceList`, `ReportComparisonBlock`,
   `ReportKpiStrip`, `ReportKpiTile`, `ReportSparkline`, `ReportTrendChart`,
   `ReportBarList`, `ReportDonut`, `ReportEvidencePanel`,

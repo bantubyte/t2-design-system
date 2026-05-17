@@ -1,6 +1,7 @@
 import {
 	type ButtonHTMLAttributes,
 	type HTMLAttributes,
+	type OutputHTMLAttributes,
 	type ReactNode,
 	useState,
 } from 'react';
@@ -21,6 +22,12 @@ import { cx } from '../utils/class-names';
 import { Badge, type BadgeTone } from './badge';
 import { Button, type ButtonProps } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
+import {
+	CardLoadingState,
+	type LoaderMotion,
+	LoadingState,
+	Skeleton,
+} from './feedback';
 
 export type ReportTone = 'neutral' | 'good' | 'watch' | 'risk' | 'info';
 
@@ -302,20 +309,32 @@ export function ReportMetricRibbon({
 export interface ReportMetricRibbonLoadingProps
 	extends HTMLAttributes<HTMLDivElement> {
 	count?: number;
+	motion?: Extract<LoaderMotion, 'none' | 'pulse' | 'shimmer' | 'wave'>;
 }
 
 export function ReportMetricRibbonLoading({
 	className,
 	count = 6,
+	motion = 'shimmer',
 	...props
 }: ReportMetricRibbonLoadingProps) {
 	return (
 		<ReportMetricRibbon
-			className={cx('pds-report-metric-ribbon--loading', className)}
+			className={cx(
+				'pds-report-metric-ribbon--loading',
+				`pds-loader-motion--${motion}`,
+				className,
+			)}
 			{...props}
 		>
 			{Array.from({ length: count }, (_, index) => (
-				<div className="pds-report-metric-tile-loading" key={index}>
+				<div
+					className={cx(
+						'pds-report-metric-tile-loading',
+						`pds-loader-motion--${motion}`,
+					)}
+					key={index}
+				>
 					<span />
 					<strong />
 					<small />
@@ -532,6 +551,7 @@ export type ReportChartLoadingVariant = 'bars' | 'line' | 'ranked';
 
 export interface ReportChartLoadingBlockProps
 	extends Omit<ReportBlockProps, 'children' | 'variant'> {
+	motion?: Extract<LoaderMotion, 'none' | 'pulse' | 'shimmer' | 'wave'>;
 	rows?: number;
 	shine?: boolean;
 	variant?: ReportChartLoadingVariant;
@@ -539,6 +559,7 @@ export interface ReportChartLoadingBlockProps
 
 export function ReportChartLoadingBlock({
 	className,
+	motion = 'shimmer',
 	rows = 6,
 	shine = true,
 	title = 'Loading report data',
@@ -550,6 +571,7 @@ export function ReportChartLoadingBlock({
 			className={cx(
 				'pds-report-chart-loading',
 				`pds-report-chart-loading--${variant}`,
+				`pds-loader-motion--${motion}`,
 				shine && 'pds-report-chart-loading--shine',
 				className,
 			)}
@@ -582,6 +604,114 @@ export function ReportChartLoadingBlock({
 				)}
 			</div>
 		</ReportBlock>
+	);
+}
+
+export interface ReportSectionLoadingStateProps
+	extends Omit<OutputHTMLAttributes<HTMLOutputElement>, 'title'> {
+	chartCount?: number;
+	motion?: Extract<LoaderMotion, 'none' | 'pulse' | 'shimmer' | 'wave'>;
+	title?: ReactNode;
+}
+
+export function ReportSectionLoadingState({
+	chartCount = 2,
+	className,
+	motion = 'shimmer',
+	title = 'Loading report section',
+	...props
+}: ReportSectionLoadingStateProps) {
+	return (
+		<output
+			aria-busy="true"
+			className={cx('pds-report-section-loader', className)}
+			{...props}
+		>
+			<div className="pds-report-section-loader__header">
+				<div>
+					<Skeleton height="0.65rem" motion={motion} width="7rem" />
+					<h3>{title}</h3>
+				</div>
+				<LoadingState label="Processing" motion="orbit" size="sm" />
+			</div>
+			<div className="pds-report-section-loader__charts">
+				{Array.from({ length: chartCount }, (_, index) => (
+					<ReportChartLoadingBlock
+						key={index}
+						motion={motion}
+						title={index === 0 ? 'Reach' : index === 1 ? 'VAC' : 'Frequency'}
+						variant={
+							index % 3 === 1 ? 'line' : index % 3 === 2 ? 'ranked' : 'bars'
+						}
+					/>
+				))}
+			</div>
+		</output>
+	);
+}
+
+export interface ReportPageLoadingStateProps
+	extends Omit<OutputHTMLAttributes<HTMLOutputElement>, 'title'> {
+	chartCount?: number;
+	metricCount?: number;
+	motion?: Extract<LoaderMotion, 'none' | 'pulse' | 'shimmer' | 'wave'>;
+	sectionCount?: number;
+	title?: ReactNode;
+}
+
+export function ReportPageLoadingState({
+	chartCount = 3,
+	className,
+	metricCount = 6,
+	motion = 'shimmer',
+	sectionCount = 2,
+	title = 'Loading report',
+	...props
+}: ReportPageLoadingStateProps) {
+	const safeChartCount = Math.max(1, chartCount);
+	const safeMetricCount = Math.max(1, metricCount);
+	const safeSectionCount = Math.max(1, sectionCount);
+	const chartsPerSection = Math.max(
+		1,
+		Math.ceil(safeChartCount / safeSectionCount),
+	);
+
+	return (
+		<output
+			aria-busy="true"
+			aria-live="polite"
+			className={cx('pds-report-page-loader', className)}
+			{...props}
+		>
+			<div className="pds-report-page-loader__header">
+				<div>
+					<span className="pds-report-page-loader__eyebrow">Reporting</span>
+					<h2>{title}</h2>
+				</div>
+				<LoadingState
+					label="Building insight blocks"
+					motion="orbit"
+					size="sm"
+				/>
+			</div>
+			<ReportMetricRibbonLoading count={safeMetricCount} motion={motion} />
+			<div className="pds-report-page-loader__summary">
+				<CardLoadingState media="banner" motion={motion} rows={4} />
+				<CardLoadingState motion={motion} rows={5} />
+			</div>
+			{Array.from({ length: safeSectionCount }, (_, index) => (
+				<ReportSectionLoadingState
+					chartCount={
+						index === safeSectionCount - 1
+							? Math.max(1, safeChartCount - chartsPerSection * index)
+							: chartsPerSection
+					}
+					key={index}
+					motion={motion}
+					title={index === 0 ? 'Performance Trends' : 'Evidence And Placements'}
+				/>
+			))}
+		</output>
 	);
 }
 

@@ -13,6 +13,7 @@ export * from './disclosure';
 export * from './dropdown';
 export * from './feedback';
 export * from './file-upload';
+export * from './floating-button';
 export * from './footer';
 export * from './form';
 export * from './help-center';

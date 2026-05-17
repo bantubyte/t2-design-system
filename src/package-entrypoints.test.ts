@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	DonationPanel,
+	FloatingButton,
 	HelpCenter,
 	PageHero,
 	PageTemplate,
@@ -17,9 +18,10 @@ import {
 	ReportComparisonBlock,
 	ReportMetricRibbon,
 	ReportMetricTile,
+	ReportPageLoadingState,
 } from './report';
 import { createReportComparisonModel } from './report-core';
-import { RawReportMetricTile } from './report-jsx';
+import { RawReportMetricTile, RawReportPageLoadingState } from './report-jsx';
 import { jsx as reportJsx } from './report-jsx/jsx-runtime';
 import pikabooTailwindPreset from './tailwind';
 import { createDesignTheme, ThemeProvider, ThemeSwitcher } from './theme';
@@ -29,11 +31,13 @@ describe('package entrypoints', () => {
 		expect(ReportComparisonBlock).toBeTypeOf('function');
 		expect(ReportMetricRibbon).toBeTypeOf('function');
 		expect(ReportMetricTile).toBeTypeOf('function');
+		expect(ReportPageLoadingState).toBeTypeOf('function');
 	});
 
 	it('exports report core, raw JSX, and explicit React report layers', () => {
 		expect(createReportComparisonModel).toBeTypeOf('function');
 		expect(RawReportMetricTile).toBeTypeOf('function');
+		expect(RawReportPageLoadingState).toBeTypeOf('function');
 		expect(reportJsx).toBeTypeOf('function');
 		expect(ReactReportEvidenceList).toBeTypeOf('function');
 	});
@@ -67,6 +71,7 @@ describe('package entrypoints', () => {
 	it('exports support and payment patterns through the root entry', () => {
 		expect(HelpCenter).toBeTypeOf('function');
 		expect(PaymentForm).toBeTypeOf('function');
+		expect(FloatingButton).toBeTypeOf('function');
 	});
 
 	it('exports page block components through the root entry', () => {

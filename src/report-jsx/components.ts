@@ -25,6 +25,7 @@ interface RawHtmlProps {
 	className?: string;
 	disabled?: boolean;
 	id?: string;
+	key?: string | number;
 	onClick?: RawEventHandler;
 	onKeyDown?: RawEventHandler<KeyboardEvent>;
 	role?: string;
@@ -41,6 +42,9 @@ export type RawBadgeTone =
 	| 'neutral'
 	| 'success'
 	| 'warning';
+
+export type RawLoaderMotion = 'none' | 'orbit' | 'pulse' | 'shimmer' | 'wave';
+export type RawReportLoaderMotion = Exclude<RawLoaderMotion, 'orbit'>;
 
 const toneToBadgeTone: Record<ReportTone, RawBadgeTone> = {
 	good: 'success',
@@ -59,6 +63,92 @@ function rawBadge(
 		'span',
 		{ className: cx('pds-badge', `pds-badge--${tone}`, `pds-badge--${size}`) },
 		h('span', null, children),
+	);
+}
+
+function rawLoadingState(
+	label: RawJsxNode,
+	size: 'lg' | 'md' | 'sm' = 'sm',
+	motion: RawLoaderMotion = 'orbit',
+): RawJsxNode {
+	return h(
+		'div',
+		{
+			'aria-live': 'polite',
+			className: cx(
+				'pds-loading-state',
+				`pds-loading-state--${size}`,
+				`pds-loader-motion--${motion}`,
+			),
+		},
+		h('span', { className: 'pds-loading-state__spinner' }),
+		h('span', null, label),
+	);
+}
+
+function rawSkeleton({
+	className,
+	height,
+	motion = 'shimmer',
+	radius = 'md',
+	width,
+}: {
+	className?: string;
+	height?: number | string;
+	motion?: RawReportLoaderMotion;
+	radius?: 'full' | 'lg' | 'md' | 'sm';
+	width?: number | string;
+}): RawJsxNode {
+	return h('div', {
+		'aria-hidden': 'true',
+		className: cx(
+			'pds-skeleton',
+			`pds-skeleton--${motion}`,
+			`pds-skeleton--radius-${radius}`,
+			className,
+		),
+		style: { height, width },
+	});
+}
+
+function rawCardLoadingState({
+	media = false,
+	motion = 'shimmer',
+	rows = 3,
+}: {
+	media?: false | 'banner' | 'thumbnail';
+	motion?: RawReportLoaderMotion;
+	rows?: number;
+}): RawJsxNode {
+	return h(
+		'output',
+		{
+			'aria-busy': 'true',
+			className: cx(
+				'pds-card-loader',
+				'pds-card-loader--comfortable',
+				media && `pds-card-loader--media-${media}`,
+			),
+		},
+		media ? rawSkeleton({ className: 'pds-card-loader__media', motion }) : null,
+		h(
+			'div',
+			{ className: 'pds-card-loader__header' },
+			rawSkeleton({ height: '0.8rem', motion, width: '36%' }),
+			rawSkeleton({ height: '1.6rem', motion, width: '2.8rem' }),
+		),
+		h(
+			'div',
+			{ className: 'pds-card-loader__rows' },
+			Array.from({ length: rows }, (_, index) =>
+				rawSkeleton({
+					className: 'pds-card-loader__row',
+					height: '0.72rem',
+					motion,
+					width: `${index === rows - 1 ? 48 : 94 - index * 7}%`,
+				}),
+			),
+		),
 	);
 }
 
@@ -266,20 +356,32 @@ export function RawReportMetricRibbon({
 
 export interface RawReportMetricRibbonLoadingProps extends RawHtmlProps {
 	count?: number;
+	motion?: RawReportLoaderMotion;
 }
 
 export function RawReportMetricRibbonLoading({
 	className,
 	count = 6,
+	motion = 'shimmer',
 	...props
 }: RawReportMetricRibbonLoadingProps): RawJsxNode {
 	return RawReportMetricRibbon({
-		className: cx('pds-report-metric-ribbon--loading', className),
+		className: cx(
+			'pds-report-metric-ribbon--loading',
+			`pds-loader-motion--${motion}`,
+			className,
+		),
 		...props,
 		children: Array.from({ length: count }, (_, index) =>
 			h(
 				'div',
-				{ className: 'pds-report-metric-tile-loading', key: index },
+				{
+					className: cx(
+						'pds-report-metric-tile-loading',
+						`pds-loader-motion--${motion}`,
+					),
+					key: index,
+				},
 				h('span'),
 				h('strong'),
 				h('small'),
@@ -741,6 +843,7 @@ export function RawReportPlacementTable({
 
 export interface RawReportChartLoadingBlockProps
 	extends Omit<RawReportBlockProps, 'children' | 'variant'> {
+	motion?: RawReportLoaderMotion;
 	rows?: number;
 	shine?: boolean;
 	variant?: 'bars' | 'line' | 'ranked';
@@ -748,6 +851,7 @@ export interface RawReportChartLoadingBlockProps
 
 export function RawReportChartLoadingBlock({
 	className,
+	motion = 'shimmer',
 	rows = 6,
 	shine = true,
 	title = 'Loading report data',
@@ -759,6 +863,7 @@ export function RawReportChartLoadingBlock({
 		className: cx(
 			'pds-report-chart-loading',
 			`pds-report-chart-loading--${variant}`,
+			`pds-loader-motion--${motion}`,
 			shine && 'pds-report-chart-loading--shine',
 			className,
 		),
@@ -767,32 +872,161 @@ export function RawReportChartLoadingBlock({
 		children: h(
 			'div',
 			{ className: 'pds-report-chart-loading__canvas' },
-			variant === 'ranked'
+			variant === 'line'
 				? h(
-						'div',
-						{ className: 'pds-report-chart-loading__ranked' },
-						Array.from({ length: rows }, (_, index) =>
-							h(
-								'span',
-								{ key: index },
-								h('i'),
-								h('strong', { style: { width: `${96 - index * 9}%` } }),
-								h('small'),
+						'svg',
+						{ 'aria-hidden': 'true', viewBox: '0 0 640 220' },
+						h('path', {
+							d: 'M 20 180 C 130 150 180 170 260 120 S 420 80 620 52',
+						}),
+						h('path', { d: 'M 20 190 H 620 M 20 140 H 620 M 20 90 H 620' }),
+					)
+				: variant === 'ranked'
+					? h(
+							'div',
+							{ className: 'pds-report-chart-loading__ranked' },
+							Array.from({ length: rows }, (_, index) =>
+								h(
+									'span',
+									{ key: index },
+									h('i'),
+									h('strong', { style: { width: `${96 - index * 9}%` } }),
+									h('small'),
+								),
+							),
+						)
+					: h(
+							'div',
+							{ className: 'pds-report-chart-loading__bars' },
+							Array.from({ length: rows }, (_, index) =>
+								h('span', {
+									key: index,
+									style: { height: `${26 + index * 9}%` },
+								}),
 							),
 						),
-					)
-				: h(
-						'div',
-						{ className: 'pds-report-chart-loading__bars' },
-						Array.from({ length: rows }, (_, index) =>
-							h('span', {
-								key: index,
-								style: { height: `${26 + index * 9}%` },
-							}),
-						),
-					),
 		),
 	});
+}
+
+export interface RawReportSectionLoadingStateProps extends RawHtmlProps {
+	chartCount?: number;
+	motion?: RawReportLoaderMotion;
+	title?: RawJsxNode;
+}
+
+export function RawReportSectionLoadingState({
+	chartCount = 2,
+	className,
+	motion = 'shimmer',
+	title = 'Loading report section',
+	...props
+}: RawReportSectionLoadingStateProps): RawJsxNode {
+	const chartVariants = ['bars', 'line', 'ranked'] as const;
+
+	return h(
+		'output',
+		{
+			'aria-busy': 'true',
+			className: cx('pds-report-section-loader', className),
+			...props,
+		},
+		h(
+			'div',
+			{ className: 'pds-report-section-loader__header' },
+			h(
+				'div',
+				null,
+				rawSkeleton({ height: '0.65rem', motion, width: '7rem' }),
+				h('h3', null, title),
+			),
+			rawLoadingState('Processing', 'sm'),
+		),
+		h(
+			'div',
+			{ className: 'pds-report-section-loader__charts' },
+			Array.from({ length: chartCount }, (_, index) =>
+				RawReportChartLoadingBlock({
+					key: index,
+					motion,
+					title: index === 0 ? 'Reach' : index === 1 ? 'VAC' : 'Frequency',
+					variant: chartVariants[index % chartVariants.length],
+				}),
+			),
+		),
+	);
+}
+
+export interface RawReportPageLoadingStateProps extends RawHtmlProps {
+	chartCount?: number;
+	metricCount?: number;
+	motion?: RawReportLoaderMotion;
+	sectionCount?: number;
+	title?: RawJsxNode;
+}
+
+export function RawReportPageLoadingState({
+	chartCount = 3,
+	className,
+	metricCount = 6,
+	motion = 'shimmer',
+	sectionCount = 2,
+	title = 'Loading report',
+	...props
+}: RawReportPageLoadingStateProps): RawJsxNode {
+	const safeChartCount = Math.max(1, chartCount);
+	const safeMetricCount = Math.max(1, metricCount);
+	const safeSectionCount = Math.max(1, sectionCount);
+	const chartsPerSection = Math.max(
+		1,
+		Math.ceil(safeChartCount / safeSectionCount),
+	);
+
+	return h(
+		'output',
+		{
+			'aria-busy': 'true',
+			'aria-live': 'polite',
+			className: cx('pds-report-page-loader', className),
+			...props,
+		},
+		h(
+			'div',
+			{ className: 'pds-report-page-loader__header' },
+			h(
+				'div',
+				null,
+				h(
+					'span',
+					{ className: 'pds-report-page-loader__eyebrow' },
+					'Reporting',
+				),
+				h('h2', null, title),
+			),
+			rawLoadingState('Building insight blocks', 'sm'),
+		),
+		RawReportMetricRibbonLoading({
+			count: safeMetricCount,
+			motion,
+		}),
+		h(
+			'div',
+			{ className: 'pds-report-page-loader__summary' },
+			rawCardLoadingState({ media: 'banner', motion, rows: 4 }),
+			rawCardLoadingState({ motion, rows: 5 }),
+		),
+		Array.from({ length: safeSectionCount }, (_, index) =>
+			RawReportSectionLoadingState({
+				chartCount:
+					index === safeSectionCount - 1
+						? Math.max(1, safeChartCount - chartsPerSection * index)
+						: chartsPerSection,
+				key: index,
+				motion,
+				title: index === 0 ? 'Performance Trends' : 'Evidence And Placements',
+			}),
+		),
+	);
 }
 
 export const ReportMetricTile = RawReportMetricTile;
@@ -804,3 +1038,5 @@ export const ReportRankedListBlock = RawReportRankedListBlock;
 export const ReportTourCallout = RawReportTourCallout;
 export const ReportPlacementTable = RawReportPlacementTable;
 export const ReportChartLoadingBlock = RawReportChartLoadingBlock;
+export const ReportSectionLoadingState = RawReportSectionLoadingState;
+export const ReportPageLoadingState = RawReportPageLoadingState;

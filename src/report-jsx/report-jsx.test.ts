@@ -2,6 +2,7 @@ import {
 	RawReportComparisonBlock,
 	RawReportEvidenceList,
 	RawReportMetricTile,
+	RawReportPageLoadingState,
 	renderRawJsxToDom,
 	renderRawJsxToHtml,
 } from './index';
@@ -19,6 +20,26 @@ describe('report-jsx raw renderer contract', () => {
 		expect(html).toContain('pds-report-metric-tile');
 		expect(html).toContain('Reach');
 		expect(html).toContain('3.3M');
+	});
+
+	it('renders raw report loading states with motion classes', () => {
+		const html = renderRawJsxToHtml(
+			RawReportPageLoadingState({
+				chartCount: 3,
+				metricCount: 4,
+				motion: 'wave',
+				sectionCount: 2,
+				title: 'Enhanced Ads Reporting',
+			}),
+		);
+
+		expect(html).toContain('pds-report-page-loader');
+		expect(html).toContain('pds-loader-motion--wave');
+		expect(html.match(/pds-report-metric-tile-loading/g)).toHaveLength(4);
+		expect(
+			html.match(/pds-report-chart-loading pds-report-chart-loading--/g),
+		).toHaveLength(3);
+		expect(html).toContain('Enhanced Ads Reporting');
 	});
 
 	it('attaches raw DOM event handlers for metric selection', () => {
