@@ -4,6 +4,19 @@ import {
 	type ReactNode,
 	useState,
 } from 'react';
+import {
+	createReportComparisonModel,
+	createReportEvidenceModel,
+	createReportPlacementTableModel,
+	createReportRankedListModel,
+	createReportSeriesPath,
+	createReportTourModel,
+	getInitialReportEvidenceState,
+	getReportNumbers,
+	getReportRange,
+	reduceReportEvidenceState,
+	reduceReportTourState,
+} from '../report-core';
 import { cx } from '../utils/class-names';
 import { Badge, type BadgeTone } from './badge';
 import { Button, type ButtonProps } from './button';
@@ -349,25 +362,23 @@ export function ReportTourCallout({
 }: ReportTourCalloutProps) {
 	const [uncontrolledStepIndex, setUncontrolledStepIndex] =
 		useState(defaultStepIndex);
-	const safeStepIndex = Math.max(
-		0,
-		Math.min(stepIndex ?? uncontrolledStepIndex, Math.max(steps.length - 1, 0)),
-	);
-	const activeStep = steps[safeStepIndex];
-	const progress =
-		steps.length > 0 ? ((safeStepIndex + 1) / steps.length) * 100 : 0;
+	const tourModel = createReportTourModel(steps, {
+		stepIndex: stepIndex ?? uncontrolledStepIndex,
+	});
+	const activeStep = tourModel.activeStep;
 
 	const setStep = (nextStepIndex: number) => {
-		const nextSafeStepIndex = Math.max(
-			0,
-			Math.min(nextStepIndex, Math.max(steps.length - 1, 0)),
+		const nextState = reduceReportTourState(
+			{ stepIndex: tourModel.stepIndex },
+			{ stepIndex: nextStepIndex, type: 'go' },
+			{ stepCount: steps.length },
 		);
 		if (stepIndex === undefined) {
-			setUncontrolledStepIndex(nextSafeStepIndex);
+			setUncontrolledStepIndex(nextState.stepIndex);
 		}
-		const nextStep = steps[nextSafeStepIndex];
+		const nextStep = steps[nextState.stepIndex];
 		if (nextStep) {
-			onStepChange?.(nextSafeStepIndex, nextStep);
+			onStepChange?.(nextState.stepIndex, nextStep);
 		}
 	};
 
@@ -378,14 +389,14 @@ export function ReportTourCallout({
 			<div className="pds-report-tour-callout__topline">
 				<Badge tone="brand">
 					{progressLabel ??
-						`Dashboard · ${String(safeStepIndex + 1).padStart(2, '0')}`}
+						`Dashboard · ${String(tourModel.stepIndex + 1).padStart(2, '0')}`}
 				</Badge>
 				<button onClick={onSkip} type="button">
 					{skipLabel}
 				</button>
 			</div>
 			<div className="pds-report-tour-callout__progress">
-				<span style={{ width: `${progress}%` }} />
+				<span style={{ width: `${tourModel.progressPercent}%` }} />
 			</div>
 			<div className="pds-report-tour-callout__copy">
 				{activeStep.kicker ? <p>{activeStep.kicker}</p> : null}
@@ -394,22 +405,22 @@ export function ReportTourCallout({
 			</div>
 			<div className="pds-report-tour-callout__actions">
 				<Button
-					disabled={safeStepIndex === 0}
-					onClick={() => setStep(safeStepIndex - 1)}
+					disabled={tourModel.isFirst}
+					onClick={() => setStep(tourModel.stepIndex - 1)}
 					variant="ghost"
 				>
 					{backLabel}
 				</Button>
 				<Button
 					onClick={() => {
-						if (safeStepIndex >= steps.length - 1) {
+						if (tourModel.isLast) {
 							onComplete?.();
 							return;
 						}
-						setStep(safeStepIndex + 1);
+						setStep(tourModel.stepIndex + 1);
 					}}
 				>
-					{safeStepIndex >= steps.length - 1 ? 'Done' : nextLabel}
+					{tourModel.isLast ? 'Done' : nextLabel}
 				</Button>
 			</div>
 		</div>
@@ -600,7 +611,7 @@ export function ReportRankedListBlock({
 	title = 'Ranked list',
 	...props
 }: ReportRankedListBlockProps) {
-	const maxValue = Math.max(...items.map((item) => item.value), 1);
+	const rankedList = createReportRankedListModel(items, selectedItemId);
 
 	return (
 		<ReportBlock
@@ -610,15 +621,14 @@ export function ReportRankedListBlock({
 			{...props}
 		>
 			<div className="pds-report-ranked-list__items">
-				{items.map((item) => {
-					const selected = item.id === selectedItemId;
+				{rankedList.items.map((item) => {
 					const tone = item.tone ?? 'info';
 					return (
 						<button
-							aria-pressed={selected}
+							aria-pressed={item.selected}
 							className={cx(
 								'pds-report-ranked-list__item',
-								selected && 'pds-report-ranked-list__item--selected',
+								item.selected && 'pds-report-ranked-list__item--selected',
 							)}
 							key={item.id}
 							onClick={() => onItemSelect?.(item)}
@@ -634,7 +644,7 @@ export function ReportRankedListBlock({
 							<span className="pds-report-ranked-list__track">
 								<span
 									style={{
-										width: `${Math.round((item.value / maxValue) * 100)}%`,
+										width: `${item.percent}%`,
 									}}
 								/>
 							</span>
@@ -801,14 +811,23 @@ export function ReportEvidenceList({
 }: ReportEvidenceListProps) {
 	const [uncontrolledExpandedItemId, setUncontrolledExpandedItemId] = useState<
 		string | undefined
-	>(() => defaultExpandedItemId ?? items[0]?.id);
+	>(
+		() =>
+			getInitialReportEvidenceState(items, defaultExpandedItemId)
+				.expandedItemId,
+	);
 	const activeExpandedItemId = expandedItemId ?? uncontrolledExpandedItemId;
+	const evidenceModel = createReportEvidenceModel(items, {
+		expandedItemId: activeExpandedItemId,
+	});
 
 	const setExpandedItem = (itemId: string) => {
+		const nextState = reduceReportEvidenceState(
+			{ expandedItemId: activeExpandedItemId },
+			{ itemId, type: 'toggle' },
+		);
 		if (expandedItemId === undefined) {
-			setUncontrolledExpandedItemId((current) =>
-				current === itemId ? undefined : itemId,
-			);
+			setUncontrolledExpandedItemId(nextState.expandedItemId);
 		}
 		onExpandedItemChange?.(itemId);
 	};
@@ -821,19 +840,18 @@ export function ReportEvidenceList({
 			{...props}
 		>
 			<div className="pds-report-evidence-list__items">
-				{items.map((item) => {
-					const expanded = item.id === activeExpandedItemId;
+				{evidenceModel.items.map((item) => {
 					const tone = item.tone ?? 'info';
 					return (
 						<div
 							className={cx(
 								'pds-report-evidence-list__item',
-								expanded && 'pds-report-evidence-list__item--expanded',
+								item.expanded && 'pds-report-evidence-list__item--expanded',
 							)}
 							key={item.id}
 						>
 							<button
-								aria-expanded={expanded}
+								aria-expanded={item.expanded}
 								onClick={() => setExpandedItem(item.id)}
 								type="button"
 							>
@@ -842,7 +860,7 @@ export function ReportEvidenceList({
 								</Badge>
 								<span>{item.title}</span>
 							</button>
-							{expanded ? (
+							{item.expanded ? (
 								<div className="pds-report-evidence-list__detail">
 									{item.detail ? <p>{item.detail}</p> : null}
 									{item.source ? <small>{item.source}</small> : null}
@@ -882,14 +900,6 @@ export interface ReportComparisonBlockProps
 	winner?: 'left' | 'right' | 'tie';
 }
 
-const getMetricWinner = (
-	metric: ReportComparisonMetric,
-): 'left' | 'right' | 'tie' => {
-	if (metric.winner) return metric.winner;
-	if (metric.leftValue === metric.rightValue) return 'tie';
-	return metric.leftValue > metric.rightValue ? 'left' : 'right';
-};
-
 export function ReportComparisonBlock({
 	className,
 	defaultWinner,
@@ -901,20 +911,24 @@ export function ReportComparisonBlock({
 	winner,
 	...props
 }: ReportComparisonBlockProps) {
-	const computedWinner =
-		defaultWinner ??
-		(metrics.reduce((score, metric) => {
-			const metricWinner = getMetricWinner(metric);
-			if (metricWinner === 'left') return score + 1;
-			if (metricWinner === 'right') return score - 1;
-			return score;
-		}, 0) >= 0
-			? 'left'
-			: 'right');
+	const computedWinner = createReportComparisonModel({
+		defaultWinner,
+		left,
+		metrics,
+		right,
+		winner,
+	}).winner;
 	const [uncontrolledWinner, setUncontrolledWinner] = useState<
 		'left' | 'right' | 'tie'
 	>(() => computedWinner);
 	const activeWinner = winner ?? uncontrolledWinner;
+	const comparison = createReportComparisonModel({
+		defaultWinner,
+		left,
+		metrics,
+		right,
+		winner: activeWinner,
+	});
 
 	const setWinner = (nextWinner: 'left' | 'right' | 'tie') => {
 		if (winner === undefined) {
@@ -926,10 +940,12 @@ export function ReportComparisonBlock({
 	return (
 		<ReportBlock
 			actions={
-				<Badge tone={activeWinner === 'tie' ? 'neutral' : 'success'}>
-					{activeWinner === 'tie'
+				<Badge tone={comparison.winner === 'tie' ? 'neutral' : 'success'}>
+					{comparison.winner === 'tie'
 						? 'Tie'
-						: `${activeWinner === 'left' ? left.label : right.label} leads`}
+						: `${
+								comparison.winner === 'left' ? left.label : right.label
+							} leads`}
 				</Badge>
 			}
 			className={cx('pds-report-comparison', className)}
@@ -938,22 +954,16 @@ export function ReportComparisonBlock({
 			{...props}
 		>
 			<div className="pds-report-comparison__entities">
-				{(
-					[
-						{ entity: left, side: 'left' },
-						{ entity: right, side: 'right' },
-					] as const
-				).map(({ entity, side }) => {
-					const selected = activeWinner === side;
+				{comparison.entities.map((entity) => {
 					return (
 						<button
-							aria-pressed={selected}
+							aria-pressed={entity.selected}
 							className={cx(
 								'pds-report-comparison__entity',
-								selected && 'pds-report-comparison__entity--selected',
+								entity.selected && 'pds-report-comparison__entity--selected',
 							)}
 							key={entity.id}
-							onClick={() => setWinner(side)}
+							onClick={() => setWinner(entity.side)}
 							type="button"
 						>
 							<strong>{entity.label}</strong>
@@ -964,9 +974,7 @@ export function ReportComparisonBlock({
 				})}
 			</div>
 			<div className="pds-report-comparison__metrics">
-				{metrics.map((metric, index) => {
-					const metricWinner = getMetricWinner(metric);
-					const max = Math.max(metric.leftValue, metric.rightValue, 1);
+				{comparison.metrics.map((metric, index) => {
 					return (
 						<div className="pds-report-comparison__metric" key={index}>
 							<div className="pds-report-comparison__metric-label">
@@ -977,13 +985,13 @@ export function ReportComparisonBlock({
 								<span
 									className={cx(
 										'pds-report-comparison__bar',
-										metricWinner === 'left' &&
+										metric.winner === 'left' &&
 											'pds-report-comparison__bar--winner',
 									)}
 								>
 									<span
 										style={{
-											width: `${Math.round((metric.leftValue / max) * 100)}%`,
+											width: `${metric.leftPercent}%`,
 										}}
 									/>
 									<strong>
@@ -994,13 +1002,13 @@ export function ReportComparisonBlock({
 								<span
 									className={cx(
 										'pds-report-comparison__bar',
-										metricWinner === 'right' &&
+										metric.winner === 'right' &&
 											'pds-report-comparison__bar--winner',
 									)}
 								>
 									<span
 										style={{
-											width: `${Math.round((metric.rightValue / max) * 100)}%`,
+											width: `${metric.rightPercent}%`,
 										}}
 									/>
 									<strong>
@@ -1017,37 +1025,9 @@ export function ReportComparisonBlock({
 	);
 }
 
-const getNumbers = (values: readonly (number | null | undefined)[]): number[] =>
-	values.filter((value): value is number => typeof value === 'number');
-
-const getRange = (values: readonly (number | null | undefined)[]) => {
-	const numbers = getNumbers(values);
-	const min = Math.min(...numbers, 0);
-	const max = Math.max(...numbers, 1);
-	return { max, min, span: max - min || 1 };
-};
-
-const pointsToPath = (
-	values: readonly (number | null | undefined)[],
-	width: number,
-	height: number,
-): string => {
-	const { min, span } = getRange(values);
-	const xStep = values.length > 1 ? width / (values.length - 1) : width;
-	let isFirstPoint = true;
-
-	return values
-		.map((value, index) => {
-			if (value == null) return '';
-			const x = index * xStep;
-			const y = height - ((value - min) / span) * height;
-			const command = isFirstPoint ? 'M' : 'L';
-			isFirstPoint = false;
-			return `${command} ${x.toFixed(2)} ${y.toFixed(2)}`;
-		})
-		.filter(Boolean)
-		.join(' ');
-};
+const getNumbers = getReportNumbers;
+const getRange = getReportRange;
+const pointsToPath = createReportSeriesPath;
 
 export interface ReportShellProps extends HTMLAttributes<HTMLDivElement> {
 	footer?: ReactNode;
@@ -1630,6 +1610,11 @@ export function ReportPlacementTable({
 	valueLabel = 'Reach',
 	...props
 }: ReportPlacementTableProps) {
+	const tableModel = createReportPlacementTableModel(rows, {
+		selectable: Boolean(onRowSelect),
+		selectedRowId,
+	});
+
 	return (
 		<div className={cx('pds-report-placement-table', className)} {...props}>
 			<table>
@@ -1644,18 +1629,14 @@ export function ReportPlacementTable({
 					</tr>
 				</thead>
 				<tbody>
-					{rows.map((row, index) => (
+					{tableModel.rows.map((row, index) => (
 						<tr
-							aria-selected={
-								row.id && row.id === selectedRowId ? true : undefined
-							}
+							aria-selected={row.selected ? true : undefined}
 							className={cx(
-								onRowSelect && 'pds-report-placement-table__row--selectable',
-								row.id &&
-									row.id === selectedRowId &&
-									'pds-report-placement-table__row--selected',
+								row.selectable && 'pds-report-placement-table__row--selectable',
+								row.selected && 'pds-report-placement-table__row--selected',
 							)}
-							key={row.id ?? index}
+							key={row.key}
 							onClick={() => onRowSelect?.(row, index)}
 							onKeyDown={(event) => {
 								if (!onRowSelect) return;
@@ -1675,11 +1656,11 @@ export function ReportPlacementTable({
 							<td>{row.format}</td>
 							<td>{row.value}</td>
 							<td>
-								{typeof row.pacing === 'number' ? (
+								{typeof row.pacingPercent === 'number' ? (
 									<span className="pds-report-placement-table__pacing">
 										<span
 											style={{
-												width: `${Math.max(0, Math.min(120, row.pacing * 100))}%`,
+												width: `${row.pacingPercent}%`,
 											}}
 										/>
 									</span>

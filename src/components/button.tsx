@@ -1,5 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import { cx } from '../utils/class-names';
+import { Icon, isPdsIconName, type PdsIconName } from './icons';
 
 export type ButtonVariant =
 	| 'primary'
@@ -60,14 +61,21 @@ Button.displayName = 'Button';
 
 export interface IconButtonProps
 	extends Omit<ButtonProps, 'children' | 'leftIcon' | 'rightIcon'> {
-	icon: ReactNode;
+	icon: PdsIconName | ReactNode;
 	label: string;
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-	({ icon, label, size = 'icon', ...props }, ref) => (
-		<Button aria-label={label} ref={ref} size={size} title={label} {...props}>
-			{icon}
+	({ className, icon, label, size = 'icon', ...props }, ref) => (
+		<Button
+			aria-label={label}
+			className={cx('pds-icon-button', className)}
+			ref={ref}
+			size={size}
+			title={label}
+			{...props}
+		>
+			{isPdsIconName(icon) ? <Icon name={icon} /> : icon}
 		</Button>
 	),
 );

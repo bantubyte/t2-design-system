@@ -2,10 +2,11 @@ import {
 	type ButtonHTMLAttributes,
 	type HTMLAttributes,
 	type ReactNode,
+	useEffect,
 	useState,
 } from 'react';
 import { cx } from '../utils/class-names';
-import { Button } from './button';
+import { Button, IconButton } from './button';
 
 export interface GuidedWizardStep<TValue extends string = string> {
 	disabled?: boolean;
@@ -34,6 +35,10 @@ export function GuidedWizardStepper<TValue extends string = string>({
 		() => defaultStep ?? steps.find((step) => !step.disabled)?.value,
 	);
 	const selectedStep = activeStep ?? uncontrolledStep;
+	const selectedIndex = Math.max(
+		0,
+		steps.findIndex((step) => step.value === selectedStep),
+	);
 
 	const setStep = (nextStep: TValue) => {
 		if (activeStep === undefined) {
@@ -48,7 +53,11 @@ export function GuidedWizardStepper<TValue extends string = string>({
 				const selected = step.value === selectedStep;
 				const status =
 					step.status ??
-					(selected ? 'current' : index === 0 ? 'complete' : 'upcoming');
+					(selected
+						? 'current'
+						: index < selectedIndex
+							? 'complete'
+							: 'upcoming');
 
 				return (
 					<button
@@ -72,46 +81,89 @@ export function GuidedWizardStepper<TValue extends string = string>({
 	);
 }
 
+export type GuidedWizardSize = 'sm' | 'md' | 'lg' | 'xl';
+
 export interface GuidedWizardShellProps
 	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
 	backAction?: ButtonHTMLAttributes<HTMLButtonElement>;
+	descriptionId?: string;
+	dismissible?: boolean;
 	footer?: ReactNode;
 	heading?: ReactNode;
 	icon?: ReactNode;
+	onOpenChange?: (open: boolean) => void;
 	open?: boolean;
+	size?: GuidedWizardSize;
 	title?: ReactNode;
+	titleId?: string;
 }
 
 export function GuidedWizardShell({
 	backAction,
 	children,
 	className,
+	descriptionId,
+	dismissible = true,
 	footer,
 	heading,
 	icon,
+	onOpenChange,
 	open = true,
+	size = 'md',
 	title,
+	titleId,
 	...props
 }: GuidedWizardShellProps) {
+	useEffect(() => {
+		if (!open || !dismissible) return;
+
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				onOpenChange?.(false);
+			}
+		};
+
+		document.addEventListener('keydown', onKeyDown);
+		return () => document.removeEventListener('keydown', onKeyDown);
+	}, [dismissible, onOpenChange, open]);
+
 	if (!open) return null;
 
 	return (
 		<div className="pds-guided-wizard-overlay">
 			<div
+				aria-describedby={descriptionId}
+				aria-labelledby={titleId}
 				aria-modal="true"
-				className={cx('pds-guided-wizard', className)}
+				className={cx(
+					'pds-guided-wizard',
+					`pds-guided-wizard--${size}`,
+					className,
+				)}
 				role="dialog"
 				{...props}
 			>
 				<div className="pds-guided-wizard__header">
 					<div className="pds-guided-wizard__title">
 						{icon ? <span>{icon}</span> : null}
-						{title ? <strong>{title}</strong> : null}
+						{title ? <strong id={titleId}>{title}</strong> : null}
 					</div>
-					{backAction ? (
-						<Button size="sm" variant="outline" {...backAction}>
-							{backAction.children ?? 'Back'}
-						</Button>
+					{backAction || dismissible ? (
+						<div className="pds-guided-wizard__actions">
+							{backAction ? (
+								<Button size="sm" variant="outline" {...backAction}>
+									{backAction.children ?? 'Back'}
+								</Button>
+							) : null}
+							{dismissible ? (
+								<IconButton
+									icon="close"
+									label="Close wizard"
+									onClick={() => onOpenChange?.(false)}
+									variant="ghost"
+								/>
+							) : null}
+						</div>
 					) : null}
 				</div>
 				{heading ? (

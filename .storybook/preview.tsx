@@ -6,7 +6,11 @@ import '../src/styles.css';
 const withTheme: Decorator = (Story, context) => {
 	const [, updateGlobals] = useGlobals();
 	const selectedTheme =
-		context.globals.theme === 'primedia' ? 'primedia' : 'pikaboo';
+		context.globals.theme === 'primedia'
+			? 'primedia'
+			: context.globals.theme === 'pikaboo-dark'
+				? 'pikaboo-dark'
+				: 'pikaboo';
 
 	return (
 		<ThemeProvider
@@ -34,6 +38,7 @@ const preview: Preview = {
 				icon: 'paintbrush',
 				items: [
 					{ value: 'pikaboo', title: 'Pikaboo' },
+					{ value: 'pikaboo-dark', title: 'Pikaboo Dark' },
 					{ value: 'primedia', title: 'Primedia / Cortexx' },
 				],
 				showName: true,

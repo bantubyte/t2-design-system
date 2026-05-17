@@ -1,12 +1,20 @@
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import {
+	Button,
+	CampaignChoiceChips,
+	CampaignControlCard,
+	CampaignControlRow,
+	CampaignHierarchySelector,
 	CampaignListCard,
 	CampaignListToolbar,
+	CampaignRangeControl,
 	CampaignScheduleDialog,
+	CampaignSetupReviewRail,
+	CampaignSetupWorkspace,
 	SiteInventoryPanel,
 	SupportRequestDialog,
-} from './campaign';
+} from './index';
 
 (
 	globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -216,5 +224,129 @@ describe('campaign workflow component interactions', () => {
 		click(findButton(container, 'Set Dates'));
 
 		expect(appliedDays).toBe(14);
+	});
+
+	it('renders compact setup cards with useful rail content', () => {
+		const container = render(
+			<CampaignSetupWorkspace
+				footer={<div>Missing: Name, Locations, Dates</div>}
+				sidebar={
+					<CampaignSetupReviewRail
+						action={<Button>Continue</Button>}
+						completionValue={62}
+						sections={[
+							{
+								items: [
+									{ label: 'Campaign name', status: 'missing' },
+									{ label: 'Target audience', value: '15 - 84 years' },
+								],
+								title: 'Core',
+							},
+						]}
+					/>
+				}
+			>
+				<CampaignControlCard
+					description="Search or browse the geographic hierarchy."
+					icon="map"
+					title="Target locations"
+				>
+					<CampaignControlRow
+						description="Use province, municipality, and local area levels."
+						title="Location tree"
+						value="4 selected"
+					>
+						<div>Tree goes here</div>
+					</CampaignControlRow>
+				</CampaignControlCard>
+			</CampaignSetupWorkspace>,
+		);
+
+		expect(container.textContent).toContain('Target locations');
+		expect(container.textContent).toContain('62%');
+		expect(container.textContent).toContain('Missing');
+		expect(container.textContent).toContain('Continue');
+	});
+
+	it('keeps hierarchy selectors searchable with branch-level show more', () => {
+		let selectedIds: string[] = [];
+		const container = render(
+			<CampaignHierarchySelector
+				defaultExpandedIds={['province-eastern-cape']}
+				nodes={[
+					{
+						children: [
+							{
+								id: 'buffalo-city',
+								label: 'Buffalo City',
+								type: 'Municipality',
+							},
+							{ id: 'emalahleni', label: 'Emalahleni', type: 'Municipality' },
+							{ id: 'engcobo', label: 'Engcobo', type: 'Municipality' },
+							{
+								id: 'enoch-mgijima',
+								label: 'Enoch Mgijima',
+								type: 'Municipality',
+							},
+							{
+								id: 'nelson-mandela-bay',
+								label: 'Nelson Mandela Bay',
+								type: 'Municipality',
+							},
+						],
+						id: 'province-eastern-cape',
+						label: 'Eastern Cape',
+						type: 'Province',
+					},
+				]}
+				onSelectedIdsChange={(ids) => {
+					selectedIds = ids;
+				}}
+			/>,
+		);
+
+		expect(container.textContent).toContain('Show 1 more');
+		expect(container.textContent).not.toContain('Nelson Mandela Bay');
+
+		click(findButton(container, 'Show 1 more'));
+		expect(container.textContent).toContain('Nelson Mandela Bay');
+
+		click(container.querySelector('input[type="checkbox"]'));
+		expect(selectedIds).toContain('province-eastern-cape');
+
+		inputValue(container.querySelector('input[type="search"]'), 'Nelson');
+		expect(container.textContent).toContain('Nelson Mandela Bay');
+	});
+
+	it('reports range and chip changes from campaign setup controls', () => {
+		const ranges: unknown[] = [];
+		const chips: string[][] = [];
+		const container = render(
+			<div>
+				<CampaignRangeControl
+					defaultValue={[15, 84]}
+					label="Age range"
+					max={100}
+					min={0}
+					onValueChange={(value) => ranges.push(value)}
+					unit="years"
+				/>
+				<CampaignChoiceChips
+					defaultSelectedValues={['female']}
+					onSelectedValuesChange={(values) => chips.push(values)}
+					options={[
+						{ label: 'Female', value: 'female' },
+						{ label: 'Male', value: 'male' },
+					]}
+				/>
+			</div>,
+		);
+
+		const numberInputs = container.querySelectorAll('input[type="number"]');
+		inputValue(numberInputs[0], '20');
+		click(findButton(container, 'Male'));
+
+		expect(ranges[ranges.length - 1]).toEqual([20, 84]);
+		expect(chips[chips.length - 1]).toEqual(['female', 'male']);
 	});
 });

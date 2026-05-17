@@ -4,13 +4,21 @@ import {
 	Badge,
 	Button,
 	CampaignCardGrid,
+	CampaignChoiceChips,
+	CampaignControlCard,
+	CampaignControlRow,
+	CampaignHierarchySelector,
 	CampaignListCard,
 	CampaignListToolbar,
+	CampaignRangeControl,
 	CampaignScheduleDialog,
+	CampaignSetupReviewRail,
+	CampaignSetupWorkspace,
 	CampaignStatCard,
 	SectionHeader,
 	SiteInventoryPanel,
 	SupportRequestDialog,
+	ThemeProvider,
 	ThemeSwitcher,
 } from '../index';
 
@@ -122,6 +130,65 @@ const inventoryItems = [
 		title: 'AD014 - Victory Plaza - University',
 	},
 ];
+
+const locationHierarchy = [
+	{
+		children: [
+			{ id: 'buffalo-city', label: 'Buffalo City', type: 'Municipality' },
+			{ id: 'emalahleni', label: 'Emalahleni', type: 'Municipality' },
+			{ id: 'engcobo', label: 'Engcobo', type: 'Municipality' },
+			{ id: 'enoch-mgijima', label: 'Enoch Mgijima', type: 'Municipality' },
+			{
+				id: 'nelson-mandela-bay',
+				label: 'Nelson Mandela Bay',
+				type: 'Municipality',
+			},
+		],
+		defaultExpanded: true,
+		id: 'eastern-cape',
+		label: 'Eastern Cape',
+		type: 'Province',
+	},
+	{
+		children: [
+			{ id: 'city-of-cape-town', label: 'City of Cape Town', type: 'Metro' },
+			{ id: 'garden-route', label: 'Garden Route', type: 'District' },
+			{ id: 'overberg', label: 'Overberg', type: 'District' },
+		],
+		id: 'western-cape',
+		label: 'Western Cape',
+		type: 'Province',
+	},
+] as const;
+
+const proximityHierarchy = [
+	{
+		children: [
+			{
+				children: [
+					{
+						id: 'agriculture-business-location',
+						label: 'Agriculture Business',
+						type: 'Location',
+					},
+					{ id: 'preston-watts', label: 'Preston Watts', type: 'Location' },
+				],
+				defaultExpanded: true,
+				id: 'agriculture-business-subcategory',
+				label: 'Agriculture Business',
+				type: 'Subcategory',
+			},
+			{ id: 'farm', label: 'Farm', type: 'Subcategory' },
+			{ id: 'farm-supplies', label: 'Farm Supplies', type: 'Subcategory' },
+			{ id: 'agri-coop', label: 'Agricultural Co-op', type: 'Subcategory' },
+			{ id: 'feed-store', label: 'Feed Store', type: 'Subcategory' },
+		],
+		defaultExpanded: true,
+		id: 'agriculture-business',
+		label: 'Agriculture Business',
+		type: 'Category',
+	},
+] as const;
 
 export const CampaignListWorkbench: Story = {
 	parameters: {
@@ -297,6 +364,176 @@ export const AddSitesInventory: Story = {
 			</main>
 		);
 	},
+};
+
+export const CampaignSetupControls: Story = {
+	parameters: {
+		docs: {
+			source: {
+				code: `import {
+  CampaignControlCard,
+  CampaignHierarchySelector,
+  CampaignRangeControl,
+  CampaignSetupReviewRail,
+  CampaignSetupWorkspace,
+} from '@pikaboo/web-design-system';
+
+<CampaignSetupWorkspace sidebar={<CampaignSetupReviewRail sections={sections} />}>
+  <CampaignControlCard icon="map" title="Target Locations">
+    <CampaignHierarchySelector nodes={locationHierarchy} />
+  </CampaignControlCard>
+</CampaignSetupWorkspace>`,
+			},
+		},
+	},
+	render: () => (
+		<ThemeProvider theme="primedia">
+			<main className="pds-story-frame pds-story-frame--theme-aware">
+				<SectionHeader
+					description="Compact campaign setup cards for hierarchy trees, range controls, selection chips, and a useful review rail."
+					eyebrow="Create Campaign"
+					title="Campaign Setup Controls"
+				/>
+				<CampaignSetupWorkspace
+					footer={
+						<div className="pds-campaign-setup-story-alert">
+							<Badge tone="warning">Missing</Badge>
+							Name, Locations, Dates
+						</div>
+					}
+					sidebar={
+						<CampaignSetupReviewRail
+							action={<Button rightIcon="→">Continue setup</Button>}
+							completionValue={58}
+							sections={[
+								{
+									items: [
+										{ label: 'Campaign name', status: 'missing' },
+										{ label: 'Client', status: 'missing' },
+										{ label: 'Target locations', status: 'missing' },
+										{ label: 'Campaign dates', status: 'missing' },
+									],
+									title: 'Required',
+								},
+								{
+									items: [
+										{ label: 'Budget', value: 'R1,000,000' },
+										{ label: 'Age range', value: '15 - 84 years' },
+										{ label: 'Gender', value: 'Female, Male' },
+										{ label: 'Income range', value: 'ZAR 0 - 2.4M+' },
+									],
+									title: 'Audience',
+								},
+							]}
+							title="Setup review"
+						/>
+					}
+				>
+					<CampaignControlCard
+						description="Contained, searchable, branch-aware tree with a show-more preview."
+						icon="map"
+						meta="2 levels"
+						title="Target locations"
+					>
+						<CampaignControlRow
+							description="Province, municipality, district, or local area."
+							title="Add location"
+							value="Western Cape"
+						>
+							<CampaignHierarchySelector
+								defaultSelectedIds={['city-of-cape-town']}
+								nodes={locationHierarchy}
+								searchPlaceholder="Search locations..."
+							/>
+						</CampaignControlRow>
+					</CampaignControlCard>
+
+					<CampaignControlCard
+						description="Use proximity categories without dumping the whole tree."
+						icon="search"
+						meta="Preview 4"
+						title="Proximity points"
+					>
+						<CampaignControlRow
+							description="Category, subcategory, and specific point hierarchy."
+							title="Add proximity point"
+							value="5 km"
+						>
+							<CampaignHierarchySelector
+								defaultSelectedIds={['preston-watts']}
+								nodes={proximityHierarchy}
+								searchPlaceholder="Search proximity points..."
+							/>
+						</CampaignControlRow>
+						<CampaignRangeControl
+							defaultValue={5}
+							label="Proximity radius"
+							max={50}
+							min={1}
+							unit="km"
+						/>
+					</CampaignControlCard>
+
+					<CampaignControlCard
+						description="Audience filters keep inputs, sliders, and summary badges in one rhythm."
+						icon="users"
+						meta="Demographics"
+						title="Target audience"
+					>
+						<CampaignRangeControl
+							defaultValue={[15, 84]}
+							label="Age range"
+							max={84}
+							min={15}
+							unit="years"
+						/>
+						<CampaignControlRow
+							description="Select one or more audiences."
+							title="Gender"
+							value="2 selected"
+						>
+							<CampaignChoiceChips
+								defaultSelectedValues={['female', 'male']}
+								options={[
+									{ label: 'Female', value: 'female' },
+									{ label: 'Male', value: 'male' },
+								]}
+							/>
+						</CampaignControlRow>
+						<CampaignRangeControl
+							defaultValue={[0, 2457600]}
+							formatValue={(value) =>
+								value === 2457600
+									? 'ZAR 2,457,600+'
+									: `ZAR ${new Intl.NumberFormat('en-ZA').format(value)}`
+							}
+							label="Income range"
+							max={2457600}
+							min={0}
+							step={50000}
+						/>
+					</CampaignControlCard>
+
+					<CampaignControlCard
+						description="Keep the brief in a normal card, not a giant empty panel."
+						icon="spark"
+						title="Campaign brief"
+					>
+						<CampaignControlRow
+							description="The host product can swap this for a textarea, AI brief helper, or uploaded brief."
+							title="Write your brief"
+							value="Optional"
+						>
+							<div className="pds-campaign-setup-story-brief">
+								Launch awareness around commuter corridors with emphasis on high
+								reach and measurable location intelligence.
+							</div>
+						</CampaignControlRow>
+					</CampaignControlCard>
+				</CampaignSetupWorkspace>
+			</main>
+		</ThemeProvider>
+	),
 };
 
 export const ScheduleDialog: Story = {

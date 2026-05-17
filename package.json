@@ -6,7 +6,7 @@
 	"private": false,
 	"publishConfig": {
 		"access": "restricted",
-		"registry": "https://timbuk2-539247467239.d.codeartifact.af-south-1.amazonaws.com/npm/timbuk2/"
+		"registry": "https://timbuk2-539247467239.d.codeartifact.eu-west-1.amazonaws.com/npm/npm/"
 	},
 	"engines": {
 		"node": ">=24.0.0",
@@ -32,10 +32,50 @@
 			"import": "./dist/auth.js",
 			"require": "./dist/auth.cjs"
 		},
+		"./auth-core": {
+			"types": "./dist/auth-core.d.ts",
+			"import": "./dist/auth-core.js",
+			"require": "./dist/auth-core.cjs"
+		},
+		"./auth-jsx": {
+			"types": "./dist/auth-jsx.d.ts",
+			"import": "./dist/auth-jsx.js",
+			"require": "./dist/auth-jsx.cjs"
+		},
+		"./auth-jsx/jsx-runtime": {
+			"types": "./dist/auth-jsx/jsx-runtime.d.ts",
+			"import": "./dist/auth-jsx/jsx-runtime.js",
+			"require": "./dist/auth-jsx/jsx-runtime.cjs"
+		},
+		"./react/auth": {
+			"types": "./dist/react/auth.d.ts",
+			"import": "./dist/react/auth.js",
+			"require": "./dist/react/auth.cjs"
+		},
+		"./react/report": {
+			"types": "./dist/react/report.d.ts",
+			"import": "./dist/react/report.js",
+			"require": "./dist/react/report.cjs"
+		},
 		"./report": {
 			"types": "./dist/report.d.ts",
 			"import": "./dist/report.js",
 			"require": "./dist/report.cjs"
+		},
+		"./report-core": {
+			"types": "./dist/report-core.d.ts",
+			"import": "./dist/report-core.js",
+			"require": "./dist/report-core.cjs"
+		},
+		"./report-jsx": {
+			"types": "./dist/report-jsx.d.ts",
+			"import": "./dist/report-jsx.js",
+			"require": "./dist/report-jsx.cjs"
+		},
+		"./report-jsx/jsx-runtime": {
+			"types": "./dist/report-jsx/jsx-runtime.d.ts",
+			"import": "./dist/report-jsx/jsx-runtime.js",
+			"require": "./dist/report-jsx/jsx-runtime.cjs"
 		},
 		"./tailwind": {
 			"types": "./dist/tailwind.d.ts",
@@ -57,7 +97,7 @@
 		"build:package": "npm run type-check && npm run check && npm test && npm run build",
 		"prepublishOnly": "npm run build:package",
 		"pack:check": "npm_config_cache=/private/tmp/pds-npm-cache npm pack --dry-run",
-		"artifact:login": "aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository timbuk2 --region af-south-1",
+		"artifact:login": "aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region eu-west-1",
 		"publish:artifact:dry-run": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --dry-run --access restricted",
 		"publish:artifact": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --access restricted",
 		"lint": "biome lint --error-on-warnings",

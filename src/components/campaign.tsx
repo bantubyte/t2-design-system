@@ -1,11 +1,13 @@
 import {
 	type ButtonHTMLAttributes,
+	type CSSProperties,
 	type FormEvent,
 	type HTMLAttributes,
 	type KeyboardEvent,
 	type LabelHTMLAttributes,
 	type ReactNode,
 	useId,
+	useMemo,
 	useState,
 } from 'react';
 import { cx } from '../utils/class-names';
@@ -29,7 +31,8 @@ import {
 	DialogTitle,
 } from './dialog';
 import { Progress } from './feedback';
-import { Field, Input, Select, Textarea } from './form';
+import { Field, Input, Select, Slider, Textarea } from './form';
+import { Icon, isPdsIconName, type PdsIconName } from './icons';
 
 export interface CampaignSummaryCardProps
 	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -238,6 +241,703 @@ export function ActionBar({
 		</div>
 	);
 }
+
+export interface CampaignSetupWorkspaceProps
+	extends HTMLAttributes<HTMLDivElement> {
+	footer?: ReactNode;
+	sidebar?: ReactNode;
+}
+
+export function CampaignSetupWorkspace({
+	children,
+	className,
+	footer,
+	sidebar,
+	...props
+}: CampaignSetupWorkspaceProps) {
+	return (
+		<div className={cx('pds-campaign-setup-workspace', className)} {...props}>
+			<div className="pds-campaign-setup-workspace__main">{children}</div>
+			{sidebar ? (
+				<aside className="pds-campaign-setup-workspace__sidebar">
+					{sidebar}
+				</aside>
+			) : null}
+			{footer ? (
+				<div className="pds-campaign-setup-workspace__footer">{footer}</div>
+			) : null}
+		</div>
+	);
+}
+
+export interface CampaignControlCardProps
+	extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+	description?: ReactNode;
+	icon?: PdsIconName | ReactNode;
+	meta?: ReactNode;
+	title: ReactNode;
+}
+
+export function CampaignControlCard({
+	children,
+	className,
+	description,
+	icon,
+	meta,
+	title,
+	...props
+}: CampaignControlCardProps) {
+	return (
+		<section className={cx('pds-campaign-control-card', className)} {...props}>
+			<header className="pds-campaign-control-card__header">
+				{icon ? (
+					<span className="pds-campaign-control-card__icon">
+						{renderCampaignIcon(icon)}
+					</span>
+				) : null}
+				<div>
+					<h2>{title}</h2>
+					{description ? <p>{description}</p> : null}
+				</div>
+				{meta ? (
+					<span className="pds-campaign-control-card__meta">{meta}</span>
+				) : null}
+			</header>
+			<div className="pds-campaign-control-card__body">{children}</div>
+		</section>
+	);
+}
+
+export interface CampaignControlRowProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	description?: ReactNode;
+	title: ReactNode;
+	value?: ReactNode;
+}
+
+export function CampaignControlRow({
+	children,
+	className,
+	description,
+	title,
+	value,
+	...props
+}: CampaignControlRowProps) {
+	return (
+		<div className={cx('pds-campaign-control-row', className)} {...props}>
+			<div className="pds-campaign-control-row__copy">
+				<strong>{title}</strong>
+				{description ? <span>{description}</span> : null}
+			</div>
+			{value ? <Badge tone="info">{value}</Badge> : null}
+			<div className="pds-campaign-control-row__control">{children}</div>
+		</div>
+	);
+}
+
+export type CampaignRangeValue = number | readonly [number, number];
+
+export interface CampaignRangeControlProps
+	extends Omit<
+		HTMLAttributes<HTMLDivElement>,
+		'defaultValue' | 'onChange' | 'title'
+	> {
+	defaultValue?: CampaignRangeValue;
+	formatValue?: (value: number) => ReactNode;
+	label: ReactNode;
+	max: number;
+	min: number;
+	onValueChange?: (value: CampaignRangeValue) => void;
+	step?: number;
+	unit?: ReactNode;
+	value?: CampaignRangeValue;
+}
+
+export function CampaignRangeControl({
+	className,
+	defaultValue,
+	formatValue = (value) => value,
+	label,
+	max,
+	min,
+	onValueChange,
+	step = 1,
+	unit,
+	value,
+	...props
+}: CampaignRangeControlProps) {
+	const rangeId = useId();
+	const fromInputId = `${rangeId}-from`;
+	const toInputId = `${rangeId}-to`;
+	const valueInputId = `${rangeId}-value`;
+	const [uncontrolledValue, setUncontrolledValue] =
+		useState<CampaignRangeValue>(() => value ?? defaultValue ?? min);
+	const currentValue = value ?? uncontrolledValue;
+	const isRange = isCampaignRangeTuple(currentValue);
+	const startValue = isRange ? currentValue[0] : min;
+	const endValue = isRange ? currentValue[1] : currentValue;
+	const normalizedStart = clampNumber(startValue, min, max);
+	const normalizedEnd = clampNumber(endValue, min, max);
+	const lowValue = Math.min(normalizedStart, normalizedEnd);
+	const highValue = Math.max(normalizedStart, normalizedEnd);
+	const lowPercent = rangeToPercent(lowValue, min, max);
+	const highPercent = rangeToPercent(highValue, min, max);
+	const rangeLabel = isRange
+		? `${stringifyNode(formatValue(lowValue))} - ${stringifyNode(formatValue(highValue))}`
+		: stringifyNode(formatValue(highValue));
+
+	const setCurrentValue = (nextValue: CampaignRangeValue) => {
+		if (value === undefined) {
+			setUncontrolledValue(nextValue);
+		}
+		onValueChange?.(nextValue);
+	};
+
+	return (
+		<div
+			className={cx(
+				'pds-campaign-range-control',
+				isRange && 'pds-campaign-range-control--dual',
+				className,
+			)}
+			style={
+				{
+					'--pds-range-end': `${highPercent}%`,
+					'--pds-range-start': `${isRange ? lowPercent : 0}%`,
+				} as CSSProperties
+			}
+			{...props}
+		>
+			<div className="pds-campaign-range-control__header">
+				<span>{label}</span>
+				<Badge tone="info">
+					{rangeLabel}
+					{unit ? ` ${stringifyNode(unit)}` : ''}
+				</Badge>
+			</div>
+			<div className="pds-campaign-range-control__inputs">
+				{isRange ? (
+					<>
+						<label htmlFor={fromInputId}>
+							<span>From</span>
+							<Input
+								id={fromInputId}
+								max={highValue}
+								min={min}
+								onChange={(event) =>
+									setCurrentValue([Number(event.target.value), highValue])
+								}
+								step={step}
+								type="number"
+								value={lowValue}
+							/>
+						</label>
+						<label htmlFor={toInputId}>
+							<span>To</span>
+							<Input
+								id={toInputId}
+								max={max}
+								min={lowValue}
+								onChange={(event) =>
+									setCurrentValue([lowValue, Number(event.target.value)])
+								}
+								step={step}
+								type="number"
+								value={highValue}
+							/>
+						</label>
+					</>
+				) : (
+					<>
+						<label htmlFor={valueInputId}>
+							<span>Value</span>
+							<Input
+								id={valueInputId}
+								max={max}
+								min={min}
+								onChange={(event) =>
+									setCurrentValue(Number(event.target.value))
+								}
+								step={step}
+								type="number"
+								value={highValue}
+							/>
+						</label>
+						{unit ? <span>{unit}</span> : null}
+					</>
+				)}
+			</div>
+			{isRange ? (
+				<div className="pds-campaign-range-control__track">
+					<input
+						aria-label={`${stringifyNode(label)} minimum`}
+						max={highValue}
+						min={min}
+						onChange={(event) =>
+							setCurrentValue([Number(event.target.value), highValue])
+						}
+						step={step}
+						type="range"
+						value={lowValue}
+					/>
+					<input
+						aria-label={`${stringifyNode(label)} maximum`}
+						max={max}
+						min={lowValue}
+						onChange={(event) =>
+							setCurrentValue([lowValue, Number(event.target.value)])
+						}
+						step={step}
+						type="range"
+						value={highValue}
+					/>
+				</div>
+			) : (
+				<Slider
+					aria-label={stringifyNode(label)}
+					formatValue={formatValue}
+					max={max}
+					min={min}
+					onValueChange={setCurrentValue}
+					step={step}
+					value={highValue}
+				/>
+			)}
+			<div className="pds-campaign-range-control__scale">
+				<span>
+					{formatValue(min)}
+					{unit ? ` ${stringifyNode(unit)}` : ''}
+				</span>
+				<span>
+					{formatValue(max)}
+					{unit ? ` ${stringifyNode(unit)}` : ''}
+				</span>
+			</div>
+		</div>
+	);
+}
+
+export interface CampaignChoiceOption {
+	description?: ReactNode;
+	label: ReactNode;
+	value: string;
+}
+
+export interface CampaignChoiceChipsProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+	defaultSelectedValues?: readonly string[];
+	onSelectedValuesChange?: (values: string[]) => void;
+	options: readonly CampaignChoiceOption[];
+	selectedValues?: readonly string[];
+}
+
+export function CampaignChoiceChips({
+	className,
+	defaultSelectedValues = [],
+	onSelectedValuesChange,
+	options,
+	selectedValues,
+	...props
+}: CampaignChoiceChipsProps) {
+	const [uncontrolledValues, setUncontrolledValues] = useState(
+		() => new Set(defaultSelectedValues),
+	);
+	const currentValues = new Set(selectedValues ?? uncontrolledValues);
+	const toggleValue = (nextValue: string) => {
+		const nextValues = new Set(currentValues);
+		if (nextValues.has(nextValue)) {
+			nextValues.delete(nextValue);
+		} else {
+			nextValues.add(nextValue);
+		}
+		if (selectedValues === undefined) {
+			setUncontrolledValues(nextValues);
+		}
+		onSelectedValuesChange?.([...nextValues]);
+	};
+
+	return (
+		<div className={cx('pds-campaign-choice-chips', className)} {...props}>
+			{options.map((option) => {
+				const selected = currentValues.has(option.value);
+				return (
+					<button
+						aria-pressed={selected}
+						className={cx(
+							'pds-campaign-choice-chip',
+							selected && 'pds-campaign-choice-chip--selected',
+						)}
+						key={option.value}
+						onClick={() => toggleValue(option.value)}
+						type="button"
+					>
+						<span>{option.label}</span>
+						{option.description ? <small>{option.description}</small> : null}
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
+export interface CampaignHierarchyNode {
+	children?: readonly CampaignHierarchyNode[];
+	count?: ReactNode;
+	defaultExpanded?: boolean;
+	disabled?: boolean;
+	id: string;
+	label: ReactNode;
+	meta?: ReactNode;
+	type?: ReactNode;
+}
+
+export interface CampaignHierarchySelectorProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+	childrenPreviewLimit?: number;
+	defaultExpandedIds?: readonly string[];
+	defaultSelectedIds?: readonly string[];
+	emptyLabel?: ReactNode;
+	expandedIds?: readonly string[];
+	maxHeight?: number | string;
+	nodes: readonly CampaignHierarchyNode[];
+	onExpandedIdsChange?: (ids: string[]) => void;
+	onSelectedIdsChange?: (ids: string[]) => void;
+	searchLabel?: string;
+	searchPlaceholder?: string;
+	showAllLabel?: (
+		hiddenCount: number,
+		node: CampaignHierarchyNode,
+	) => ReactNode;
+	selectedIds?: readonly string[];
+}
+
+export function CampaignHierarchySelector({
+	childrenPreviewLimit = 4,
+	className,
+	defaultExpandedIds,
+	defaultSelectedIds = [],
+	emptyLabel = 'No matching options',
+	expandedIds,
+	maxHeight = '22rem',
+	nodes,
+	onExpandedIdsChange,
+	onSelectedIdsChange,
+	searchLabel = 'Search hierarchy',
+	searchPlaceholder = 'Search...',
+	showAllLabel = (hiddenCount) => `Show ${hiddenCount} more`,
+	selectedIds,
+	...props
+}: CampaignHierarchySelectorProps) {
+	const searchId = useId();
+	const [query, setQuery] = useState('');
+	const [expandedPreviewIds, setExpandedPreviewIds] = useState<Set<string>>(
+		() => new Set(),
+	);
+	const [uncontrolledExpandedIds, setUncontrolledExpandedIds] = useState(
+		() => new Set(defaultExpandedIds ?? collectDefaultExpandedIds(nodes)),
+	);
+	const [uncontrolledSelectedIds, setUncontrolledSelectedIds] = useState(
+		() => new Set(defaultSelectedIds),
+	);
+	const currentExpandedIds = new Set(expandedIds ?? uncontrolledExpandedIds);
+	const currentSelectedIds = new Set(selectedIds ?? uncontrolledSelectedIds);
+	const normalizedQuery = query.trim().toLowerCase();
+	const visibleNodes = useMemo(
+		() =>
+			normalizedQuery ? filterHierarchyNodes(nodes, normalizedQuery) : nodes,
+		[nodes, normalizedQuery],
+	);
+
+	const setExpanded = (nextExpandedIds: Set<string>) => {
+		if (expandedIds === undefined) {
+			setUncontrolledExpandedIds(nextExpandedIds);
+		}
+		onExpandedIdsChange?.([...nextExpandedIds]);
+	};
+
+	const setSelected = (nextSelectedIds: Set<string>) => {
+		if (selectedIds === undefined) {
+			setUncontrolledSelectedIds(nextSelectedIds);
+		}
+		onSelectedIdsChange?.([...nextSelectedIds]);
+	};
+
+	const toggleExpanded = (id: string) => {
+		const nextExpandedIds = new Set(currentExpandedIds);
+		if (nextExpandedIds.has(id)) {
+			nextExpandedIds.delete(id);
+		} else {
+			nextExpandedIds.add(id);
+		}
+		setExpanded(nextExpandedIds);
+	};
+
+	const toggleSelected = (id: string, selected: boolean) => {
+		const nextSelectedIds = new Set(currentSelectedIds);
+		if (selected) {
+			nextSelectedIds.add(id);
+		} else {
+			nextSelectedIds.delete(id);
+		}
+		setSelected(nextSelectedIds);
+	};
+
+	const renderNode = (node: CampaignHierarchyNode, depth: number) => {
+		const hasChildren = Boolean(node.children?.length);
+		const expanded = normalizedQuery ? true : currentExpandedIds.has(node.id);
+		const selected = currentSelectedIds.has(node.id);
+		const children = node.children ?? [];
+		const previewExpanded =
+			normalizedQuery ||
+			childrenPreviewLimit <= 0 ||
+			expandedPreviewIds.has(node.id);
+		const visibleChildren = previewExpanded
+			? children
+			: children.slice(0, childrenPreviewLimit);
+		const hiddenChildCount = children.length - visibleChildren.length;
+
+		return (
+			<li key={node.id}>
+				<div
+					className={cx(
+						'pds-campaign-hierarchy-selector__row',
+						selected && 'pds-campaign-hierarchy-selector__row--selected',
+					)}
+					style={{ '--pds-tree-depth': depth } as CSSProperties}
+				>
+					<button
+						aria-expanded={hasChildren ? expanded : undefined}
+						aria-label={
+							hasChildren
+								? `${expanded ? 'Collapse' : 'Expand'} ${stringifyNode(node.label)}`
+								: undefined
+						}
+						className="pds-campaign-hierarchy-selector__toggle"
+						disabled={!hasChildren}
+						onClick={() => toggleExpanded(node.id)}
+						type="button"
+					>
+						{hasChildren ? <Icon name="chevron-right" size={16} /> : null}
+					</button>
+					<label>
+						<input
+							checked={selected}
+							disabled={node.disabled}
+							onChange={(event) =>
+								toggleSelected(node.id, event.target.checked)
+							}
+							type="checkbox"
+						/>
+						<span>
+							<strong>{node.label}</strong>
+							{node.type || node.meta ? (
+								<small>
+									{node.type}
+									{node.type && node.meta ? ' · ' : null}
+									{node.meta}
+								</small>
+							) : null}
+						</span>
+					</label>
+					{node.count ? (
+						<span className="pds-campaign-hierarchy-selector__count">
+							{node.count}
+						</span>
+					) : null}
+				</div>
+				{hasChildren && expanded ? (
+					<ul>
+						{visibleChildren.map((child) => renderNode(child, depth + 1))}
+						{hiddenChildCount > 0 ? (
+							<li>
+								<button
+									className="pds-campaign-hierarchy-selector__show-all"
+									onClick={() => {
+										const nextExpandedPreviewIds = new Set(expandedPreviewIds);
+										nextExpandedPreviewIds.add(node.id);
+										setExpandedPreviewIds(nextExpandedPreviewIds);
+									}}
+									style={{ '--pds-tree-depth': depth + 1 } as CSSProperties}
+									type="button"
+								>
+									{showAllLabel(hiddenChildCount, node)}
+								</button>
+							</li>
+						) : null}
+					</ul>
+				) : null}
+			</li>
+		);
+	};
+
+	return (
+		<div
+			className={cx('pds-campaign-hierarchy-selector', className)}
+			{...props}
+		>
+			<label
+				className="pds-campaign-hierarchy-selector__search"
+				htmlFor={searchId}
+			>
+				<Icon aria-hidden="true" name="search" size={18} />
+				<span className="pds-visually-hidden">{searchLabel}</span>
+				<Input
+					id={searchId}
+					onChange={(event) => setQuery(event.target.value)}
+					placeholder={searchPlaceholder}
+					type="search"
+					value={query}
+				/>
+			</label>
+			<div
+				className="pds-campaign-hierarchy-selector__tree"
+				style={{ maxHeight }}
+			>
+				{visibleNodes.length ? (
+					<ul>{visibleNodes.map((node) => renderNode(node, 0))}</ul>
+				) : (
+					<div className="pds-campaign-hierarchy-selector__empty">
+						{emptyLabel}
+					</div>
+				)}
+			</div>
+		</div>
+	);
+}
+
+export interface CampaignSetupRailItem {
+	label: ReactNode;
+	status?: 'complete' | 'missing' | 'warning';
+	value?: ReactNode;
+}
+
+export interface CampaignSetupRailSection {
+	items: readonly CampaignSetupRailItem[];
+	title: ReactNode;
+}
+
+export interface CampaignSetupReviewRailProps
+	extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+	action?: ReactNode;
+	completionLabel?: ReactNode;
+	completionValue?: number;
+	sections: readonly CampaignSetupRailSection[];
+	title?: ReactNode;
+}
+
+export function CampaignSetupReviewRail({
+	action,
+	className,
+	completionLabel = 'Setup complete',
+	completionValue = 0,
+	sections,
+	title = 'Campaign setup',
+	...props
+}: CampaignSetupReviewRailProps) {
+	const missingItems = sections.flatMap((section) =>
+		section.items.filter((item) => item.status === 'missing'),
+	);
+	const safeCompletion = Math.max(0, Math.min(100, completionValue));
+
+	return (
+		<aside className={cx('pds-campaign-setup-rail', className)} {...props}>
+			<header className="pds-campaign-setup-rail__header">
+				<div>
+					<h2>{title}</h2>
+					<span>{completionLabel}</span>
+				</div>
+				<strong>{safeCompletion}%</strong>
+			</header>
+			<Progress value={safeCompletion} />
+			<div className="pds-campaign-setup-rail__sections">
+				{sections.map((section, sectionIndex) => (
+					<section key={sectionIndex}>
+						<h3>{section.title}</h3>
+						<ul>
+							{section.items.map((item, itemIndex) => (
+								<li
+									className={cx(
+										item.status &&
+											`pds-campaign-setup-rail__item--${item.status}`,
+									)}
+									key={itemIndex}
+								>
+									<span>{item.label}</span>
+									<strong>{item.value ?? 'Not set'}</strong>
+								</li>
+							))}
+						</ul>
+					</section>
+				))}
+			</div>
+			{missingItems.length ? (
+				<output className="pds-campaign-setup-rail__missing">
+					<strong>Missing</strong>
+					<span>{missingItems.map((item) => item.label).join(', ')}</span>
+				</output>
+			) : null}
+			{action ? (
+				<div className="pds-campaign-setup-rail__action">{action}</div>
+			) : null}
+		</aside>
+	);
+}
+
+const renderCampaignIcon = (icon: PdsIconName | ReactNode) =>
+	isPdsIconName(icon) ? <Icon name={icon} size={20} /> : icon;
+
+const collectDefaultExpandedIds = (
+	nodes: readonly CampaignHierarchyNode[],
+): string[] =>
+	nodes.flatMap((node) => [
+		...(node.defaultExpanded ? [node.id] : []),
+		...collectDefaultExpandedIds(node.children ?? []),
+	]);
+
+const filterHierarchyNodes = (
+	nodes: readonly CampaignHierarchyNode[],
+	query: string,
+): CampaignHierarchyNode[] =>
+	nodes.flatMap((node) => {
+		const filteredChildren = filterHierarchyNodes(node.children ?? [], query);
+		const nodeMatches = [
+			node.id,
+			stringifyNode(node.label),
+			stringifyNode(node.meta),
+			stringifyNode(node.type),
+		]
+			.join(' ')
+			.toLowerCase()
+			.includes(query);
+
+		if (!nodeMatches && filteredChildren.length === 0) return [];
+		return [
+			{
+				...node,
+				children: nodeMatches ? node.children : filteredChildren,
+			},
+		];
+	});
+
+const isCampaignRangeTuple = (
+	value: CampaignRangeValue,
+): value is readonly [number, number] => Array.isArray(value);
+
+const clampNumber = (value: number, min: number, max: number) =>
+	Math.max(min, Math.min(max, Number.isFinite(value) ? value : min));
+
+const rangeToPercent = (value: number, min: number, max: number) =>
+	max === min ? 0 : ((value - min) / (max - min)) * 100;
+
+const stringifyNode = (value: ReactNode): string => {
+	if (typeof value === 'string' || typeof value === 'number') {
+		return String(value);
+	}
+	if (Array.isArray(value)) {
+		return value.map(stringifyNode).join('');
+	}
+	return '';
+};
 
 export type CampaignStatTone =
 	| 'neutral'

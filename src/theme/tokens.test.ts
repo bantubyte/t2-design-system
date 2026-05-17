@@ -15,7 +15,7 @@ import {
 describe('theme contract', () => {
 	it('uses Pikaboo as the default brand theme and exposes Primedia as a tenant theme', () => {
 		expect(defaultThemeId).toBe('pikaboo');
-		expect(themeIds).toEqual(['pikaboo', 'primedia']);
+		expect(themeIds).toEqual(['pikaboo', 'pikaboo-dark', 'primedia']);
 	});
 
 	it('uses Cortexx as the Primedia-facing product name without adding a Cortexx theme', () => {
@@ -47,6 +47,11 @@ describe('theme contract', () => {
 			'--theme-primary': '#6b3fe4',
 			'--theme-accent': '#fdff2e',
 			'--theme-page-bg': '#fffbf5',
+		});
+		expect(getThemeCssVariables('pikaboo-dark')).toMatchObject({
+			'--theme-page-bg': '#0a0418',
+			'--theme-surface': '#160c32',
+			'--theme-foreground': '#ffffff',
 		});
 		expect(getThemeCssVariables('primedia')).toMatchObject({
 			'--theme-primary': '#2647ed',

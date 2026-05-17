@@ -56,8 +56,8 @@ describe('AuthSignUpScreen', () => {
 			</ThemeProvider>,
 		);
 
-		expect(container.textContent).toContain('Continue to Cortexx');
-		expect(container.textContent).not.toContain('Continue to -');
+		expect(container.textContent).toContain('Sign up for Cortexx');
+		expect(container.textContent).not.toContain('Sign up for -');
 	});
 
 	it('submits the entered email address', () => {
