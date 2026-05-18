@@ -50,7 +50,7 @@ export const AppLoadingSystem: Story = {
   CardLoadingState,
   ContentLoader,
   PageContentLoader,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <BigLoader label="Building report" description="Preparing campaign intelligence" />
 <PageContentLoader title="Campaigns" motion="shimmer" />
@@ -108,7 +108,7 @@ export const ReportLoadingSystem: Story = {
   ReportMetricRibbonLoading,
   ReportPageLoadingState,
   ReportSectionLoadingState,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <ReportPageLoadingState
   chartCount={6}

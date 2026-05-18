@@ -172,7 +172,7 @@ export const CustomThemeFactory: Story = {
 	parameters: {
 		docs: {
 			source: {
-				code: `import { createDesignTheme, ThemeProvider, ThemeSwitcher } from '@pikaboo/web-design-system/theme';
+				code: `import { createDesignTheme, ThemeProvider, ThemeSwitcher } from '@pikaboo/t2-design-system/theme';
 
 const demoTheme = createDesignTheme({
   id: 'demo',

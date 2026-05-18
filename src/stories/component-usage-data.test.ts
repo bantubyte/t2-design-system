@@ -31,16 +31,16 @@ describe('component usage Storybook inventory', () => {
 		const byTitle = new Map(componentUsageDocs.map((doc) => [doc.title, doc]));
 
 		expect(byTitle.get('FloatingButton')?.reactPackage).toBe(
-			'@pikaboo/web-design-system',
+			'@pikaboo/t2-design-system',
 		);
 		expect(byTitle.get('Report Blocks')?.reactPackage).toBe(
-			'@pikaboo/web-design-system/report',
+			'@pikaboo/t2-design-system/report',
 		);
 		expect(byTitle.get('Raw Report JSX')?.rawPackage).toBe(
-			'@pikaboo/web-design-system/report-jsx',
+			'@pikaboo/t2-design-system/report-jsx',
 		);
 		expect(byTitle.get('Raw Auth JSX')?.rawPackage).toBe(
-			'@pikaboo/web-design-system/auth-jsx',
+			'@pikaboo/t2-design-system/auth-jsx',
 		);
 	});
 });

@@ -93,7 +93,7 @@ aws codeartifact login \
   --region eu-west-1 \
   --profile <AWS_PROFILE>
 
-npm install @pikaboo/web-design-system
+npm install @pikaboo/t2-design-system
 ```
 
 ## CodeArtifact npm registry
@@ -147,17 +147,17 @@ import {
 	createDesignTheme,
 	ThemeProvider,
 	ThemeSwitcher,
-} from '@pikaboo/web-design-system/theme';
-import { AuthSignUpScreen } from '@pikaboo/web-design-system/auth';
-import { AuthAccessScreen } from '@pikaboo/web-design-system/react/auth';
-import { createAuthAccessModel } from '@pikaboo/web-design-system/auth-core';
+} from '@pikaboo/t2-design-system/theme';
+import { AuthSignUpScreen } from '@pikaboo/t2-design-system/auth';
+import { AuthAccessScreen } from '@pikaboo/t2-design-system/react/auth';
+import { createAuthAccessModel } from '@pikaboo/t2-design-system/auth-core';
 import {
 	ReportComparisonBlock,
 	ReportMetricRibbon,
 	ReportMetricTile,
-} from '@pikaboo/web-design-system/report';
-import { createReportComparisonModel } from '@pikaboo/web-design-system/report-core';
-import '@pikaboo/web-design-system/styles.css';
+} from '@pikaboo/t2-design-system/report';
+import { createReportComparisonModel } from '@pikaboo/t2-design-system/report-core';
+import '@pikaboo/t2-design-system/styles.css';
 ```
 
 ## Export Architecture
@@ -173,22 +173,22 @@ auth/report  -> compatibility React exports for current consumers
 
 Reports and auth now follow this split:
 
-- `@pikaboo/web-design-system/report-core`
-- `@pikaboo/web-design-system/report-jsx`
-- `@pikaboo/web-design-system/report-jsx/jsx-runtime`
-- `@pikaboo/web-design-system/react/report`
-- `@pikaboo/web-design-system/report`
-- `@pikaboo/web-design-system/auth-core`
-- `@pikaboo/web-design-system/auth-jsx`
-- `@pikaboo/web-design-system/auth-jsx/jsx-runtime`
-- `@pikaboo/web-design-system/react/auth`
-- `@pikaboo/web-design-system/auth`
+- `@pikaboo/t2-design-system/report-core`
+- `@pikaboo/t2-design-system/report-jsx`
+- `@pikaboo/t2-design-system/report-jsx/jsx-runtime`
+- `@pikaboo/t2-design-system/react/report`
+- `@pikaboo/t2-design-system/report`
+- `@pikaboo/t2-design-system/auth-core`
+- `@pikaboo/t2-design-system/auth-jsx`
+- `@pikaboo/t2-design-system/auth-jsx/jsx-runtime`
+- `@pikaboo/t2-design-system/react/auth`
+- `@pikaboo/t2-design-system/auth`
 
 Creating a tenant theme is intended to be a small override rather than a copy of
 the whole token file:
 
 ```tsx
-import { createDesignTheme, ThemeProvider } from '@pikaboo/web-design-system/theme';
+import { createDesignTheme, ThemeProvider } from '@pikaboo/t2-design-system/theme';
 
 const demoTheme = createDesignTheme({
 	id: 'demo',

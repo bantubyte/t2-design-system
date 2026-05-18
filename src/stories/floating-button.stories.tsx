@@ -35,7 +35,7 @@ const meta = {
 					'A generic draggable floating button. Use it for help, support, quick create, export, or any persistent action that should not own the dialog implementation.',
 			},
 			source: {
-				code: `import { FloatingButton } from '@pikaboo/web-design-system';
+				code: `import { FloatingButton } from '@pikaboo/t2-design-system';
 
 <FloatingButton
   icon="help"

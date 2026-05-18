@@ -150,7 +150,7 @@ export const ActionsFeedbackAndLoaders: Story = {
   CardLoadingState,
   FloatingButton,
   PageContentLoader,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <Button variant="primary" size="md">Create campaign</Button>
 <FloatingButton label="Contact Help" icon="help" />
@@ -236,7 +236,7 @@ export const FormsSelectorsAndCalendar: Story = {
   RadioCardGroup,
   SearchableSelector,
   Slider,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <SearchableSelector mode="multiple" options={markets} selectedValues={selectedMarkets} />
 <DateRangePicker minRangeDays={14} />
@@ -353,7 +353,7 @@ export const CampaignWorkflowComponents: Story = {
   CampaignListCard,
   CampaignScheduleDialog,
   SiteInventoryPanel,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <CampaignListCard progress={46} status="Planning" />
 <CampaignScheduleDialog numberOfMonths={2} />
@@ -470,7 +470,7 @@ export const ReportComponents: Story = {
   ReportKpiStrip,
   ReportPlacementTable,
   ReportTrendChart,
-} from '@pikaboo/web-design-system/report';
+} from '@pikaboo/t2-design-system/report';
 
 <ReportKpiStrip columns={4}>...</ReportKpiStrip>
 <ReportComparisonBlock left={scenarioA} right={scenarioB} metrics={metrics} />

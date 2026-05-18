@@ -45,14 +45,14 @@ export const componentUsageDocs: readonly ComponentUsageDoc[] = [
 		description:
 			'Tenant theme, product copy, brand marks, exported CSS variables, and the icon wrapper used across the system.',
 		keyProps: ['theme', 'children', 'brand', 'size', 'showDescriptor'],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   BrandLockup,
   ProductName,
   ThemeProvider,
   ThemeSwitcher,
-} from '@pikaboo/web-design-system';
-import '@pikaboo/web-design-system/styles.css';
+} from '@pikaboo/t2-design-system';
+import '@pikaboo/t2-design-system/styles.css';
 
 export function TenantFrame() {
   return (
@@ -90,14 +90,14 @@ export function TenantFrame() {
 			'people',
 			'onRemove',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   AvatarGroup,
   Badge,
   Button,
   IconButton,
   RemovableBadge,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function CampaignToolbar() {
   return (
@@ -128,8 +128,8 @@ export function CampaignToolbar() {
 			'collapseAfterMs',
 			'dragDisabled',
 		],
-		reactPackage: '@pikaboo/web-design-system',
-		reactSnippet: `import { FloatingButton } from '@pikaboo/web-design-system';
+		reactPackage: '@pikaboo/t2-design-system',
+		reactSnippet: `import { FloatingButton } from '@pikaboo/t2-design-system';
 
 export function HelpAction() {
   return (
@@ -171,7 +171,7 @@ export function HelpAction() {
 			'defaultRange',
 			'minRangeDays',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   Calendar,
   DateRangePicker,
@@ -180,7 +180,7 @@ export function HelpAction() {
   RadioCardGroup,
   Slider,
   Switch,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function CampaignBasics() {
   return (
@@ -226,7 +226,7 @@ export function CampaignBasics() {
 			'content',
 			'accept',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   CommandMenu,
   DropdownItem,
@@ -237,7 +237,7 @@ export function CampaignBasics() {
   SelectorGroup,
   SelectorOption,
   Tooltip,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function PlanningSelectors() {
   return (
@@ -292,7 +292,7 @@ export function PlanningSelectors() {
 			'cards',
 			'value',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   Alert,
   BigLoader,
@@ -301,7 +301,7 @@ export function PlanningSelectors() {
   EmptyState,
   PageContentLoader,
   Progress,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function LoadingAndEmptyStates() {
   return (
@@ -344,7 +344,7 @@ export function LoadingAndEmptyStates() {
 			'status',
 			'actions',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   Dialog,
   DialogBody,
@@ -354,7 +354,7 @@ export function LoadingAndEmptyStates() {
   GuidedWizardPanel,
   GuidedWizardShell,
   GuidedWizardStepper,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function GuidedSetupDialog() {
   return (
@@ -418,7 +418,7 @@ export function GuidedSetupDialog() {
 			'page',
 			'pageCount',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   Breadcrumbs,
   Card,
@@ -429,7 +429,7 @@ export function GuidedSetupDialog() {
   Tabs,
   Timeline,
   Toolbar,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function CampaignPage() {
   return (
@@ -466,14 +466,14 @@ export function CampaignPage() {
 			'status',
 			'change',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   ChartCard,
   DataTable,
   InsightCard,
   MetricCard,
   StatGrid,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function CampaignAnalytics() {
   return (
@@ -529,7 +529,7 @@ export function CampaignAnalytics() {
 			'onRangeChange',
 			'filters',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   CampaignCardGrid,
   CampaignListCard,
@@ -537,7 +537,7 @@ export function CampaignAnalytics() {
   CampaignScheduleDialog,
   CampaignSetupWorkspace,
   SiteInventoryPanel,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function CampaignWorkspace() {
   return (
@@ -607,7 +607,7 @@ export function CampaignWorkspace() {
 			'tone',
 			'motion',
 		],
-		reactPackage: '@pikaboo/web-design-system/report',
+		reactPackage: '@pikaboo/t2-design-system/report',
 		reactSnippet: `import {
   ReportComparisonBlock,
   ReportEvidencePanel,
@@ -616,7 +616,7 @@ export function CampaignWorkspace() {
   ReportRecommendationCard,
   ReportShell,
   ReportTrendChart,
-} from '@pikaboo/web-design-system/report';
+} from '@pikaboo/t2-design-system/report';
 
 export function PerformanceReport() {
   return (
@@ -653,9 +653,9 @@ export function PerformanceReport() {
 			'methods',
 			'amounts',
 		],
-		reactPackage: '@pikaboo/web-design-system/auth',
-		reactSnippet: `import { AuthAccessScreen } from '@pikaboo/web-design-system/auth';
-import { HelpCenter, PaymentForm } from '@pikaboo/web-design-system';
+		reactPackage: '@pikaboo/t2-design-system/auth',
+		reactSnippet: `import { AuthAccessScreen } from '@pikaboo/t2-design-system/auth';
+import { HelpCenter, PaymentForm } from '@pikaboo/t2-design-system';
 
 export function AccessAndSupport() {
   return (
@@ -700,7 +700,7 @@ export function AccessAndSupport() {
 			'items',
 			'plans',
 		],
-		reactPackage: '@pikaboo/web-design-system',
+		reactPackage: '@pikaboo/t2-design-system',
 		reactSnippet: `import {
   FeatureGrid,
   FinalCta,
@@ -708,7 +708,7 @@ export function AccessAndSupport() {
   PageTemplate,
   PricingSection,
   StatsStrip,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 export function MarketingPage() {
   return (
@@ -730,12 +730,12 @@ export function MarketingPage() {
 		description:
 			'Framework-neutral auth access screen for environments that can render the package raw JSX runtime without React.',
 		keyProps: ['productName', 'headline', 'values', 'errors', 'onSubmit'],
-		rawPackage: '@pikaboo/web-design-system/auth-jsx',
-		rawSnippet: `/** @jsxImportSource @pikaboo/web-design-system/auth-jsx */
+		rawPackage: '@pikaboo/t2-design-system/auth-jsx',
+		rawSnippet: `/** @jsxImportSource @pikaboo/t2-design-system/auth-jsx */
 import {
   RawAuthAccessScreen,
   renderRawJsxToHtml,
-} from '@pikaboo/web-design-system/auth-jsx';
+} from '@pikaboo/t2-design-system/auth-jsx';
 
 const html = renderRawJsxToHtml(
   <RawAuthAccessScreen
@@ -744,8 +744,8 @@ const html = renderRawJsxToHtml(
     values={{ email: '' }}
   />,
 );`,
-		reactPackage: '@pikaboo/web-design-system/auth',
-		reactSnippet: `import { AuthAccessScreen } from '@pikaboo/web-design-system/auth';
+		reactPackage: '@pikaboo/t2-design-system/auth',
+		reactSnippet: `import { AuthAccessScreen } from '@pikaboo/t2-design-system/auth';
 
 export function ReactAccessScreen() {
   return <AuthAccessScreen productName="Cortexx" onSubmit={handleSubmit} />;
@@ -790,15 +790,15 @@ export function ReactAccessScreen() {
 			'rows',
 			'motion',
 		],
-		rawPackage: '@pikaboo/web-design-system/report-jsx',
-		rawSnippet: `/** @jsxImportSource @pikaboo/web-design-system/report-jsx */
+		rawPackage: '@pikaboo/t2-design-system/report-jsx',
+		rawSnippet: `/** @jsxImportSource @pikaboo/t2-design-system/report-jsx */
 import {
   RawReportComparisonBlock,
   RawReportMetricRibbon,
   RawReportMetricTile,
   RawReportPlacementTable,
   RawReportPageLoadingState,
-} from '@pikaboo/web-design-system/report-jsx';
+} from '@pikaboo/t2-design-system/report-jsx';
 
 export function StaticReport() {
   return (
@@ -810,13 +810,13 @@ export function StaticReport() {
     </RawReportMetricRibbon>
   );
 }`,
-		reactPackage: '@pikaboo/web-design-system/report',
+		reactPackage: '@pikaboo/t2-design-system/report',
 		reactSnippet: `import {
   ReportComparisonBlock,
   ReportMetricRibbon,
   ReportMetricTile,
   ReportPlacementTable,
-} from '@pikaboo/web-design-system/report';
+} from '@pikaboo/t2-design-system/report';
 
 export function ReactReport() {
   return (

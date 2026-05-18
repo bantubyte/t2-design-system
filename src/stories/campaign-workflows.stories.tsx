@@ -368,7 +368,7 @@ export const CampaignSetupControls: Story = {
   CampaignRangeControl,
   CampaignSetupReviewRail,
   CampaignSetupWorkspace,
-} from '@pikaboo/web-design-system';
+} from '@pikaboo/t2-design-system';
 
 <CampaignSetupWorkspace sidebar={<CampaignSetupReviewRail sections={sections} />}>
   <CampaignControlCard icon="map" title="Target Locations">

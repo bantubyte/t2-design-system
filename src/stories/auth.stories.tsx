@@ -30,7 +30,7 @@ export const PrimediaCortexx: Story = {
 	parameters: {
 		docs: {
 			source: {
-				code: `import { AuthSignUpScreen, ThemeProvider } from '@pikaboo/web-design-system';
+				code: `import { AuthSignUpScreen, ThemeProvider } from '@pikaboo/t2-design-system';
 
 <ThemeProvider theme="primedia" applyToRoot>
   <AuthSignUpScreen
@@ -52,7 +52,7 @@ export const Pikaboo: Story = {
 	parameters: {
 		docs: {
 			source: {
-				code: `import { AuthSignUpScreen, ThemeProvider } from '@pikaboo/web-design-system';
+				code: `import { AuthSignUpScreen, ThemeProvider } from '@pikaboo/t2-design-system';
 
 <ThemeProvider theme="pikaboo" applyToRoot>
   <AuthSignUpScreen onSubmit={({ email }) => startStytchLogin(email)} />
@@ -67,7 +67,7 @@ export const Login: StoryObj<typeof AuthLoginScreen> = {
 	parameters: {
 		docs: {
 			source: {
-				code: `import { AuthLoginScreen, ThemeProvider } from '@pikaboo/web-design-system';
+				code: `import { AuthLoginScreen, ThemeProvider } from '@pikaboo/t2-design-system';
 
 <ThemeProvider theme="pikaboo" applyToRoot>
   <AuthLoginScreen onSsoSelect={(provider) => startStytchSso(provider.id)} />
@@ -82,7 +82,7 @@ export const FullAccessPanel: StoryObj<typeof AuthAccessScreen> = {
 	parameters: {
 		docs: {
 			source: {
-				code: `import { AuthAccessScreen, ThemeProvider } from '@pikaboo/web-design-system';
+				code: `import { AuthAccessScreen, ThemeProvider } from '@pikaboo/t2-design-system';
 
 <ThemeProvider theme="pikaboo-dark" applyToRoot>
   <AuthAccessScreen

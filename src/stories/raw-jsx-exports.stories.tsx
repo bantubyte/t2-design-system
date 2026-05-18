@@ -74,13 +74,13 @@ export const ReportPlainJsx: Story = {
 	parameters: {
 		docs: {
 			source: {
-				code: `/** @jsxImportSource @pikaboo/web-design-system/report-jsx */
+				code: `/** @jsxImportSource @pikaboo/t2-design-system/report-jsx */
 import {
   RawReportComparisonBlock,
   RawReportMetricRibbon,
   RawReportMetricTile,
   renderRawJsxToHtml,
-} from '@pikaboo/web-design-system/report-jsx';
+} from '@pikaboo/t2-design-system/report-jsx';
 
 const html = renderRawJsxToHtml(
   <RawReportMetricRibbon highlighted>
@@ -209,11 +209,11 @@ export const AuthPlainJsx: Story = {
 	parameters: {
 		docs: {
 			source: {
-				code: `/** @jsxImportSource @pikaboo/web-design-system/auth-jsx */
+				code: `/** @jsxImportSource @pikaboo/t2-design-system/auth-jsx */
 import {
   RawAuthAccessScreen,
   renderRawJsxToHtml,
-} from '@pikaboo/web-design-system/auth-jsx';
+} from '@pikaboo/t2-design-system/auth-jsx';
 
 const html = renderRawJsxToHtml(
   <RawAuthAccessScreen mode="login" productName="Cortexx" />

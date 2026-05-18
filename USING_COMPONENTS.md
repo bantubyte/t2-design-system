@@ -1,4 +1,4 @@
-# Using `@pikaboo/web-design-system` in a consumer app
+# Using `@pikaboo/t2-design-system` in a consumer app
 
 This guide walks through installing the Pikaboo design system in a consumer project (e.g. `app-timbuk2-marketing`). The package is published to the **private timbuk2 CodeArtifact registry** in `eu-west-1`, so consumers need to authenticate before installing.
 
@@ -38,7 +38,7 @@ This pins the `@pikaboo` scope to CodeArtifact regardless of what the global `~/
 
 ```bash
 cd submodules/app-timbuk2-marketing
-npm install @pikaboo/web-design-system
+npm install @pikaboo/t2-design-system
 ```
 
 ---
@@ -49,25 +49,25 @@ The package ships **styled subpath exports**. Import the stylesheet once at the 
 
 ```tsx
 // app root (e.g. layout.tsx / _app.tsx)
-import "@pikaboo/web-design-system/styles.css";
+import "@pikaboo/t2-design-system/styles.css";
 
 // components
-import { Badge, Button /* … */ } from "@pikaboo/web-design-system";
+import { Badge, Button /* … */ } from "@pikaboo/t2-design-system";
 
 // theme tokens
-import { /* tokens */ } from "@pikaboo/web-design-system/theme";
+import { /* tokens */ } from "@pikaboo/t2-design-system/theme";
 ```
 
 ### Available subpath exports
 
 | Import path | Purpose |
 | --- | --- |
-| `@pikaboo/web-design-system` | Core components |
-| `@pikaboo/web-design-system/styles.css` | Compiled stylesheet (import once) |
-| `@pikaboo/web-design-system/theme` | Theme tokens |
-| `@pikaboo/web-design-system/tailwind` | Tailwind preset |
-| `@pikaboo/web-design-system/auth` · `/auth-core` · `/auth-jsx` · `/react/auth` | Auth surface |
-| `@pikaboo/web-design-system/report` · `/report-core` · `/report-jsx` · `/react/report` | Report surface |
+| `@pikaboo/t2-design-system` | Core components |
+| `@pikaboo/t2-design-system/styles.css` | Compiled stylesheet (import once) |
+| `@pikaboo/t2-design-system/theme` | Theme tokens |
+| `@pikaboo/t2-design-system/tailwind` | Tailwind preset |
+| `@pikaboo/t2-design-system/auth` · `/auth-core` · `/auth-jsx` · `/react/auth` | Auth surface |
+| `@pikaboo/t2-design-system/report` · `/report-core` · `/report-jsx` · `/react/report` | Report surface |
 
 ## 5. Find usage snippets in Storybook
 
@@ -88,8 +88,8 @@ import {
 	ReportKpiStrip,
 	ReportKpiTile,
 	ReportPlacementTable,
-} from '@pikaboo/web-design-system/report';
-import '@pikaboo/web-design-system/styles.css';
+} from '@pikaboo/t2-design-system/report';
+import '@pikaboo/t2-design-system/styles.css';
 
 export function CampaignReport() {
 	return (
@@ -108,12 +108,12 @@ export function CampaignReport() {
 Plain JSX report blocks:
 
 ```tsx
-/** @jsxImportSource @pikaboo/web-design-system/report-jsx */
+/** @jsxImportSource @pikaboo/t2-design-system/report-jsx */
 import {
 	RawReportMetricRibbon,
 	RawReportMetricTile,
 	renderRawJsxToHtml,
-} from '@pikaboo/web-design-system/report-jsx';
+} from '@pikaboo/t2-design-system/report-jsx';
 
 const html = renderRawJsxToHtml(
 	<RawReportMetricRibbon highlighted>
@@ -125,7 +125,7 @@ const html = renderRawJsxToHtml(
 Floating action button:
 
 ```tsx
-import { FloatingButton } from '@pikaboo/web-design-system';
+import { FloatingButton } from '@pikaboo/t2-design-system';
 
 export function HelpAction() {
 	return (
@@ -146,5 +146,5 @@ export function HelpAction() {
 ## Troubleshooting
 
 - **`401 Unauthorized` on install** — CodeArtifact token expired. Re-run step 1.
-- **`404 Not Found` for `@pikaboo/web-design-system`** — the version in `package.json` hasn't been published yet. From this repo, run `npm run build:package && npm run publish:artifact`.
+- **`404 Not Found` for `@pikaboo/t2-design-system`** — the version in `package.json` hasn't been published yet. From this repo, run `npm run build:package && npm run publish:artifact`.
 - **Peer dep warnings** — the package declares `react ^18.3.0 || ^19.0.0` as a peer. Make sure the consumer satisfies that.
