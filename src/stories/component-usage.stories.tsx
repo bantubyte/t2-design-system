@@ -84,12 +84,11 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
 					{copied ? 'Copied' : 'Copy'}
 				</button>
 			</div>
-			<section aria-label={`${label} code snippet`}>
-				{/* biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable code block needs keyboard access per axe scrollable-region-focusable. */}
-				<pre tabIndex={0}>
-					<code>{code}</code>
-				</pre>
-			</section>
+			{/* biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable code block needs keyboard access per axe scrollable-region-focusable. */}
+			{/* biome-ignore lint/a11y/useSemanticElements: <pre role="group"> is intentional — a fieldset/legend pair would impose form semantics that don't fit a code snippet. */}
+			<pre aria-label={`${label} code snippet`} role="group" tabIndex={0}>
+				<code>{code}</code>
+			</pre>
 		</div>
 	);
 }

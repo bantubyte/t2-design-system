@@ -1552,9 +1552,17 @@ export function ReportDonut({
 							);
 						})}
 						{centerLabel ? (
-							<text className="pds-report-donut__center" x="60" y="64">
-								{centerLabel}
-							</text>
+							<>
+								<circle
+									className="pds-report-donut__center-bg"
+									cx="60"
+									cy="60"
+									r={radius - 12}
+								/>
+								<text className="pds-report-donut__center" x="60" y="64">
+									{centerLabel}
+								</text>
+							</>
 						) : null}
 					</svg>
 					<div className="pds-report-donut__legend">

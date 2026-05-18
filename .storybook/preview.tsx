@@ -44,7 +44,21 @@ const preview: Preview = {
 	},
 	parameters: {
 		layout: 'centered',
-		a11y: { test: 'todo' },
+		a11y: {
+			test: 'error',
+			// axe doesn't model SVG text-over-fill contrast (the donut centre sits
+			// inside a hole with its own surface-filled disc behind the text, but
+			// axe samples a chart segment as background and false-positives).
+			context: { exclude: [['.pds-report-donut__center']] },
+			// nested-interactive is a known todo for CampaignListCard +
+			// ReportMetricTile: the card-wide click target intentionally coexists
+			// with inner action buttons. Documented in
+			// src/components/{campaign,report}.test.tsx; revisit when we adopt
+			// the stretched-link pattern.
+			config: {
+				rules: [{ id: 'nested-interactive', enabled: false }],
+			},
+		},
 		controls: {
 			matchers: {
 				color: /(background|color)$/i,
