@@ -35,6 +35,93 @@ export function BrandMark({ className, size = 32, ...props }: BrandMarkProps) {
 	);
 }
 
+export type PikabooWordmarkTone = 'auto' | 'dark' | 'light' | 'mono';
+
+export interface PikabooWordmarkProps
+	extends Omit<SVGProps<SVGSVGElement>, 'title'> {
+	accentColor?: string;
+	accessibleLabel?: string;
+	height?: number;
+	textColor?: string;
+	tone?: PikabooWordmarkTone;
+}
+
+export function PikabooWordmark({
+	accentColor,
+	accessibleLabel = 'Pikaboo',
+	className,
+	height = 32,
+	textColor,
+	tone = 'auto',
+	...props
+}: PikabooWordmarkProps) {
+	const aspectRatio = 280 / 64;
+
+	return (
+		<svg
+			aria-label={accessibleLabel}
+			className={cx(
+				'pds-pikaboo-wordmark',
+				`pds-pikaboo-wordmark--tone-${tone}`,
+				className,
+			)}
+			fill="none"
+			height={height}
+			role="img"
+			viewBox="0 0 280 64"
+			width={height * aspectRatio}
+			{...props}
+		>
+			<title>{accessibleLabel}</title>
+			<text
+				className="pds-pikaboo-wordmark__text"
+				dominantBaseline="auto"
+				fill={textColor ?? 'currentColor'}
+				fontFamily='"Bricolage Grotesque", var(--theme-font-heading), Helvetica Neue, Helvetica, Arial, sans-serif'
+				fontSize="58"
+				fontWeight="800"
+				letterSpacing="-2.4"
+				x="0"
+				y="48"
+			>
+				pikab
+			</text>
+			<g className="pds-pikaboo-wordmark__eye">
+				<circle
+					className="pds-pikaboo-wordmark__iris"
+					cx="180"
+					cy="30"
+					fill={textColor ?? 'currentColor'}
+					r="22"
+				/>
+				<circle
+					className="pds-pikaboo-wordmark__pupil"
+					cx="180"
+					cy="34"
+					fill={accentColor ?? 'var(--theme-accent)'}
+					r="7"
+				/>
+			</g>
+			<g className="pds-pikaboo-wordmark__eye">
+				<circle
+					className="pds-pikaboo-wordmark__iris"
+					cx="232"
+					cy="30"
+					fill={textColor ?? 'currentColor'}
+					r="22"
+				/>
+				<circle
+					className="pds-pikaboo-wordmark__pupil"
+					cx="232"
+					cy="34"
+					fill={accentColor ?? 'var(--theme-accent)'}
+					r="7"
+				/>
+			</g>
+		</svg>
+	);
+}
+
 export interface ProductNameProps extends HTMLAttributes<HTMLSpanElement> {
 	withTenant?: boolean;
 }
@@ -57,10 +144,15 @@ export function ProductName({
 	);
 }
 
+export type BrandLockupSurface = 'pearl' | 'purple' | 'slate' | 'violet-ink';
+
 export interface BrandLockupProps extends HTMLAttributes<HTMLDivElement> {
 	markSize?: number;
 	showTenant?: boolean;
 	subtitle?: string;
+	surface?: BrandLockupSurface;
+	useWordmark?: boolean;
+	wordmarkHeight?: number;
 }
 
 export function BrandLockup({
@@ -68,6 +160,9 @@ export function BrandLockup({
 	markSize = 36,
 	showTenant = true,
 	subtitle,
+	surface,
+	useWordmark = false,
+	wordmarkHeight,
 	...props
 }: BrandLockupProps) {
 	const { theme } = useTheme();
@@ -75,12 +170,29 @@ export function BrandLockup({
 		subtitle ?? (showTenant ? theme.copy.tenantName : theme.name);
 
 	return (
-		<div className={cx('pds-brand-lockup', className)} {...props}>
-			<BrandMark size={markSize} />
-			<div className="pds-brand-lockup__text">
-				<ProductName />
-				<span className="pds-brand-lockup__meta">{supportingText}</span>
-			</div>
+		<div
+			className={cx(
+				'pds-brand-lockup',
+				surface && `pds-brand-lockup--surface-${surface}`,
+				useWordmark && 'pds-brand-lockup--wordmark',
+				className,
+			)}
+			{...props}
+		>
+			{useWordmark ? (
+				<PikabooWordmark
+					height={wordmarkHeight ?? markSize}
+					tone={surface === 'pearl' ? 'light' : 'dark'}
+				/>
+			) : (
+				<BrandMark size={markSize} />
+			)}
+			{supportingText ? (
+				<div className="pds-brand-lockup__text">
+					{useWordmark ? null : <ProductName />}
+					<span className="pds-brand-lockup__meta">{supportingText}</span>
+				</div>
+			) : null}
 		</div>
 	);
 }

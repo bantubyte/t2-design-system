@@ -17,13 +17,18 @@ export const pdsIconNames = [
 	'google',
 	'grid',
 	'help',
+	'linkedin',
+	'mail',
 	'map',
 	'menu',
+	'minus',
 	'plus',
+	'quote',
 	'search',
 	'settings',
 	'spark',
 	'support',
+	'twitter',
 	'upload',
 	'users',
 	'whatsapp',
@@ -130,6 +135,23 @@ const iconPaths: Record<PdsIconName, readonly IconPath[]> = {
 		},
 		{ d: 'M12 17h.01', element: 'path' },
 	],
+	linkedin: [
+		{
+			element: 'rect',
+			props: { height: 18, rx: 2, width: 18, x: 3, y: 3 },
+		},
+		{ d: 'M8 10v7', element: 'path' },
+		{ d: 'M8 7h.01', element: 'path' },
+		{ d: 'M12 17v-4a2 2 0 0 1 4 0v4', element: 'path' },
+		{ d: 'M12 10v7', element: 'path' },
+	],
+	mail: [
+		{
+			element: 'rect',
+			props: { height: 16, rx: 2, width: 20, x: 2, y: 4 },
+		},
+		{ d: 'm2 7 10 6 10-6', element: 'path' },
+	],
 	map: [
 		{ d: 'M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Z', element: 'path' },
 		{ d: 'M9 3v15', element: 'path' },
@@ -140,9 +162,20 @@ const iconPaths: Record<PdsIconName, readonly IconPath[]> = {
 		{ d: 'M4 12h16', element: 'path' },
 		{ d: 'M4 17h16', element: 'path' },
 	],
+	minus: [{ d: 'M5 12h14', element: 'path' }],
 	plus: [
 		{ d: 'M12 5v14', element: 'path' },
 		{ d: 'M5 12h14', element: 'path' },
+	],
+	quote: [
+		{
+			d: 'M7 7h4v6c0 2.2-1.5 3.7-3.5 4',
+			element: 'path',
+		},
+		{
+			d: 'M15 7h4v6c0 2.2-1.5 3.7-3.5 4',
+			element: 'path',
+		},
 	],
 	search: [
 		{ element: 'circle', props: { cx: 11, cy: 11, r: 7 } },
@@ -166,6 +199,14 @@ const iconPaths: Record<PdsIconName, readonly IconPath[]> = {
 		{ d: 'M8 12a4 4 0 0 1 8 0v4a2 2 0 0 1-2 2h-1', element: 'path' },
 		{ d: 'M8 13v-1', element: 'path' },
 		{ d: 'M16 13v-1', element: 'path' },
+	],
+	twitter: [
+		{
+			d: 'M4 4 11 13l-7 7h2.5L13 14.5 17.5 20H21l-7.5-9.5L20 4h-2.5l-5 5.5L8 4Z',
+			element: 'path',
+			fill: 'currentColor',
+			stroke: 'none',
+		},
 	],
 	upload: [
 		{ d: 'M12 21V9', element: 'path' },
