@@ -30,6 +30,12 @@
 	--theme-surface-elevated: #ffffff;
 	--theme-border: rgb(107 63 228 / 0.2);
 	--theme-border-strong: rgb(107 63 228 / 0.34);
+	--theme-inverse-bg: #160c32;
+	--theme-inverse-bg-deep: #0a0418;
+	--theme-inverse-foreground: #ffffff;
+	--theme-inverse-foreground-muted: #d9d4ff;
+	--theme-inverse-foreground-subtle: #a99fd6;
+	--theme-inverse-border: rgb(255 255 255 / 0.16);
 	--theme-page-gradient: linear-gradient(
 		135deg,
 		#121212 0%,
@@ -120,6 +126,12 @@
 	--theme-surface-elevated: #ffffff;
 	--theme-border: rgb(12 46 99 / 0.16);
 	--theme-border-strong: rgb(12 46 99 / 0.28);
+	--theme-inverse-bg: #0c1a3a;
+	--theme-inverse-bg-deep: #060f24;
+	--theme-inverse-foreground: #ffffff;
+	--theme-inverse-foreground-muted: #cbd6ea;
+	--theme-inverse-foreground-subtle: #8ea1c5;
+	--theme-inverse-border: rgb(255 255 255 / 0.16);
 	--theme-page-gradient: linear-gradient(
 		180deg,
 		#f4f6fa 0%,
@@ -6615,6 +6627,12 @@
 	--theme-surface-elevated: #211044;
 	--theme-border: rgb(255 255 255 / 0.16);
 	--theme-border-strong: rgb(255 255 255 / 0.28);
+	--theme-inverse-bg: #160c32;
+	--theme-inverse-bg-deep: #0a0418;
+	--theme-inverse-foreground: #ffffff;
+	--theme-inverse-foreground-muted: #d9d4ff;
+	--theme-inverse-foreground-subtle: #a99fd6;
+	--theme-inverse-border: rgb(255 255 255 / 0.16);
 	--theme-page-gradient: linear-gradient(
 		180deg,
 		#0a0418 0%,
