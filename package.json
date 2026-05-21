@@ -1,6 +1,6 @@
 {
 	"name": "@pikaboo/t2-design-system",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Pikaboo design system tokens, themes, and React components.",
 	"type": "module",
 	"private": false,
@@ -9,7 +9,7 @@
 		"registry": "https://timbuk2-539247467239.d.codeartifact.eu-west-1.amazonaws.com/npm/npm/"
 	},
 	"engines": {
-		"node": ">=24.0.0",
+		"node": ">=22.14.0",
 		"npm": ">=10.9.0"
 	},
 	"sideEffects": [
