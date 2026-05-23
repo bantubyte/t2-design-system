@@ -5,6 +5,7 @@ export const componentUsageCategories = [
 	'Feedback',
 	'Navigation',
 	'Data Display',
+	'Charts',
 	'Campaign',
 	'Reports',
 	'Auth',
@@ -28,6 +29,83 @@ export interface ComponentUsageDoc {
 }
 
 export const componentUsageDocs: readonly ComponentUsageDoc[] = [
+	{
+		category: 'Charts',
+		components: [
+			'ChartProvider',
+			'LineChart',
+			'AreaChart',
+			'BarChart',
+			'ComboChart',
+			'PieChart',
+			'ScatterChart',
+			'RadarChart',
+			'RadialBarChart',
+			'Treemap',
+			'FunnelChart',
+			'Heatmap',
+			'CalendarHeatmap',
+			'Histogram',
+			'BoxPlot',
+			'RibbonChart',
+			'WaterfallChart',
+			'SankeyChart',
+			'Sparkline',
+			'BarList',
+			'CategoryBar',
+			'KpiCard',
+			'KpiStrip',
+			'BigNumber',
+			'Gauge',
+			'ProgressBar',
+			'ProgressCircle',
+		],
+		description:
+			'Recharts-backed BI components plus CSS-grid specialty charts, KPI primitives, themed palettes, a11y table fallbacks, and formatter utilities.',
+		keyProps: [
+			'ariaLabel',
+			'data',
+			'xKey',
+			'series',
+			'palette',
+			'showLegend',
+			'yFormat',
+		],
+		reactPackage: '@pikaboo/t2-design-system/charts',
+		reactSnippet: `import {
+  ChartProvider,
+  KpiCard,
+  KpiStrip,
+  LineChart,
+} from '@pikaboo/t2-design-system/charts';
+import { formatCompactNumber } from '@pikaboo/t2-design-system/charts-core';
+
+const compact = formatCompactNumber();
+
+export function CampaignBiPanel() {
+  return (
+    <ChartProvider palette="colorblind">
+      <KpiStrip columns={3}>
+        <KpiCard label="Reach" value="2.6M" delta="+12%" />
+        <KpiCard label="Pacing" value="88%" tone="watch" />
+        <KpiCard label="Attention" value="58" tone="info" />
+      </KpiStrip>
+      <LineChart
+        ariaLabel="Monthly reach trend"
+        data={[
+          { month: 'Jan', reach: 1280000 },
+          { month: 'Feb', reach: 1520000 },
+        ]}
+        series={[{ key: 'reach', label: 'Reach' }]}
+        xKey="month"
+        yFormat={compact}
+      />
+    </ChartProvider>
+  );
+}`,
+		storyPath: 'Charts/LineChart',
+		title: 'Charts and BI Components',
+	},
 	{
 		category: 'Foundations',
 		components: [

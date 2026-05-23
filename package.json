@@ -47,6 +47,16 @@
 			"import": "./dist/auth-jsx/jsx-runtime.js",
 			"require": "./dist/auth-jsx/jsx-runtime.cjs"
 		},
+		"./charts": {
+			"types": "./dist/charts.d.ts",
+			"import": "./dist/charts.js",
+			"require": "./dist/charts.cjs"
+		},
+		"./charts-core": {
+			"types": "./dist/charts-core.d.ts",
+			"import": "./dist/charts-core.js",
+			"require": "./dist/charts-core.cjs"
+		},
 		"./react/auth": {
 			"types": "./dist/react/auth.d.ts",
 			"import": "./dist/react/auth.js",
@@ -131,7 +141,13 @@
 	},
 	"peerDependencies": {
 		"react": "^18.3.0 || ^19.0.0",
-		"react-dom": "^18.3.0 || ^19.0.0"
+		"react-dom": "^18.3.0 || ^19.0.0",
+		"recharts": ">=2.13.0 <4"
+	},
+	"peerDependenciesMeta": {
+		"recharts": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.13",
@@ -151,6 +167,7 @@
 		"playwright": "^1.60.0",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
+		"recharts": "^2.15.4",
 		"storybook": "^10.4.0",
 		"typescript": "^6.0.3",
 		"vite": "^8.0.13",

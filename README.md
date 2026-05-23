@@ -188,6 +188,13 @@ import {
 	ReportMetricTile,
 } from '@pikaboo/t2-design-system/report';
 import { createReportComparisonModel } from '@pikaboo/t2-design-system/report-core';
+import {
+	BarChart,
+	ChartProvider,
+	LineChart,
+	KpiCard,
+} from '@pikaboo/t2-design-system/charts';
+import { formatCurrency, resolvePalette } from '@pikaboo/t2-design-system/charts-core';
 import '@pikaboo/t2-design-system/styles.css';
 ```
 
@@ -204,6 +211,8 @@ auth/report  -> compatibility React exports for current consumers
 
 Reports and auth now follow this split:
 
+- `@pikaboo/t2-design-system/charts`
+- `@pikaboo/t2-design-system/charts-core`
 - `@pikaboo/t2-design-system/report-core`
 - `@pikaboo/t2-design-system/report-jsx`
 - `@pikaboo/t2-design-system/report-jsx/jsx-runtime`
@@ -267,6 +276,13 @@ export function App() {
   `ContentLoader`, `CardLoadingState`, `PageContentLoader`, `Progress`,
   `Skeleton`, `GuidedWizardShell`, `GuidedWizardStepper`.
 - Data: `MetricCard`, `StatGrid`, `DataTable`, `ChartCard`, `InsightCard`.
+- Charts: `ChartProvider`, `LineChart`, `AreaChart`, `BarChart`,
+  `ComboChart`, `PieChart`, `ScatterChart`, `RadarChart`,
+  `RadialBarChart`, `Treemap`, `FunnelChart`, `Heatmap`,
+  `CalendarHeatmap`, `Histogram`, `BoxPlot`, `RibbonChart`,
+  `WaterfallChart`, `SankeyChart`, `Sparkline`, `BarList`,
+  `CategoryBar`, `KpiCard`, `KpiStrip`, `BigNumber`, `Gauge`,
+  `ProgressBar`, `ProgressCircle`.
 - Campaign patterns: `CampaignStatCard`, `CampaignListToolbar`,
   `CampaignCardGrid`, `CampaignListCard`, `CampaignSummaryCard`,
   `PlacementCard`, `AudienceCard`, `FilterChip`, `ActionBar`,
@@ -285,6 +301,54 @@ export function App() {
   `ReportBarList`, `ReportDonut`, `ReportEvidencePanel`,
   `ReportInsightCallout`, `ReportRecommendationCard`, `ReportCommentary`,
   `ReportPlacementTable`, `ReportSourceFooter`.
+
+## Charts
+
+Charts live on the explicit `./charts` subpath so consumers only load the BI
+surface when they import it. `recharts` is a peer dependency, kept external from
+the package bundle; Optima already provides it. Framework-neutral utilities live
+under `./charts-core` for palette resolution, formatters, scale helpers,
+reduced-motion checks, and screen-reader table generation.
+
+```tsx
+import {
+	ChartProvider,
+	LineChart,
+	KpiStrip,
+	KpiCard,
+} from '@pikaboo/t2-design-system/charts';
+import { formatCompactNumber } from '@pikaboo/t2-design-system/charts-core';
+
+const reachFormat = formatCompactNumber();
+
+export function CampaignDashboard() {
+	return (
+		<ChartProvider palette="colorblind">
+			<KpiStrip columns={3}>
+				<KpiCard label="Reach" value="2.6M" delta="+12%" />
+				<KpiCard label="Attention" value="58" delta="+6" />
+				<KpiCard label="Pacing" value="88%" tone="watch" />
+			</KpiStrip>
+			<LineChart
+				ariaLabel="Monthly reach trend"
+				data={[
+					{ month: 'Jan', reach: 1280000 },
+					{ month: 'Feb', reach: 1520000 },
+				]}
+				series={[{ key: 'reach', label: 'Reach' }]}
+				xKey="month"
+				yFormat={reachFormat}
+			/>
+		</ChartProvider>
+	);
+}
+```
+
+Every chart requires `ariaLabel`, renders a visually hidden data-table fallback,
+honors reduced motion, and uses theme CSS variables for palettes, grid, axes,
+and tooltip surfaces. Existing report chart exports (`ReportTrendChart`,
+`ReportSparkline`, `ReportDonut`, `ReportBarList`) keep their public APIs and
+now render through the shared chart primitives.
 
 ## Theme Model
 

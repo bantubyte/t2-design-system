@@ -58,6 +58,11 @@ describe('theme contract', () => {
 			'--theme-secondary': '#123f8a',
 			'--theme-page-bg': '#f4f6fa',
 		});
+		expect(getThemeCssVariables('pikaboo')).toMatchObject({
+			'--theme-chart-cat-1': '#6b3fe4',
+			'--theme-chart-primary': 'var(--theme-chart-cat-1)',
+			'--theme-chart-tooltip-bg': '#121212',
+		});
 	});
 
 	it('marks every scoped theme as part of the Pikaboo brand system', () => {

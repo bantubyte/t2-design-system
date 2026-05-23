@@ -12,6 +12,8 @@ import { AuthAccessScreen, AuthSignUpScreen } from './auth';
 import { createAuthAccessModel } from './auth-core';
 import { RawAuthAccessScreen, renderRawJsxToHtml } from './auth-jsx';
 import { jsx as authJsx } from './auth-jsx/jsx-runtime';
+import { BarChart, ChartProvider, KpiCard, LineChart } from './charts';
+import { formatCurrency, resolvePalette } from './charts-core';
 import { RawPageHero } from './marketing-jsx';
 import { jsx as marketingJsx } from './marketing-jsx/jsx-runtime';
 import { AuthLoginScreen } from './react/auth';
@@ -60,6 +62,15 @@ describe('package entrypoints', () => {
 	it('exports auth surfaces through the auth subpath entry', () => {
 		expect(AuthAccessScreen).toBeTypeOf('function');
 		expect(AuthSignUpScreen).toBeTypeOf('function');
+	});
+
+	it('exports chart components and framework-neutral chart utilities', () => {
+		expect(ChartProvider).toBeTypeOf('function');
+		expect(LineChart).toBeTypeOf('function');
+		expect(BarChart).toBeTypeOf('function');
+		expect(KpiCard).toBeTypeOf('function');
+		expect(resolvePalette('colorblind').categorical.length).toBeGreaterThan(0);
+		expect(formatCurrency({ currency: 'ZAR' })(1200)).toContain('1');
 	});
 
 	it('exports auth core, raw JSX, and explicit React auth layers', () => {

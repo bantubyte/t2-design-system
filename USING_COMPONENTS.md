@@ -66,6 +66,7 @@ import { /* tokens */ } from "@pikaboo/t2-design-system/theme";
 | `@pikaboo/t2-design-system/styles.css` | Compiled stylesheet (import once) |
 | `@pikaboo/t2-design-system/theme` | Theme tokens |
 | `@pikaboo/t2-design-system/tailwind` | Tailwind preset |
+| `@pikaboo/t2-design-system/charts` · `/charts-core` | Recharts-backed BI components and framework-neutral chart helpers |
 | `@pikaboo/t2-design-system/auth` · `/auth-core` · `/auth-jsx` · `/react/auth` | Auth surface |
 | `@pikaboo/t2-design-system/report` · `/report-core` · `/report-jsx` · `/react/report` | Report surface |
 
@@ -104,6 +105,78 @@ export function CampaignReport() {
 	);
 }
 ```
+
+Charts:
+
+```tsx
+import {
+	BarChart,
+	ChartProvider,
+	Heatmap,
+	KpiCard,
+	KpiStrip,
+	LineChart,
+} from '@pikaboo/t2-design-system/charts';
+import { formatCompactNumber, formatPercent } from '@pikaboo/t2-design-system/charts-core';
+import '@pikaboo/t2-design-system/styles.css';
+
+const compact = formatCompactNumber();
+const percent = formatPercent({ from: 'whole' });
+
+export function CampaignBiPanel() {
+	return (
+		<ChartProvider palette="colorblind">
+			<KpiStrip columns={3}>
+				<KpiCard label="Reach" value="2.6M" delta="+12%" tone="good" />
+				<KpiCard label="Pacing" value="88%" delta="-4%" tone="watch" />
+				<KpiCard label="Attention" value="58" delta="+6" tone="info" />
+			</KpiStrip>
+			<LineChart
+				ariaLabel="Monthly reach trend"
+				data={[
+					{ month: 'Jan', reach: 1280000, attention: 38 },
+					{ month: 'Feb', reach: 1520000, attention: 42 },
+					{ month: 'Mar', reach: 1880000, attention: 48 },
+				]}
+				series={[
+					{ key: 'reach', label: 'Reach' },
+					{ key: 'attention', label: 'Attention index' },
+				]}
+				xKey="month"
+				yFormat={compact}
+			/>
+			<BarChart
+				ariaLabel="Delivery by channel"
+				data={[
+					{ channel: 'Roadside', delivered: 51, planned: 42 },
+					{ channel: 'Mall', delivered: 24, planned: 28 },
+				]}
+				series={[
+					{ key: 'planned', label: 'Planned' },
+					{ key: 'delivered', label: 'Delivered' },
+				]}
+				xKey="channel"
+				yFormat={percent}
+			/>
+			<Heatmap
+				ariaLabel="Attention heatmap by daypart"
+				columnKey="daypart"
+				data={[
+					{ daypart: 'Morning', region: 'Gauteng', score: 84 },
+					{ daypart: 'Evening', region: 'Gauteng', score: 91 },
+				]}
+				rowKey="region"
+				valueKey="score"
+			/>
+		</ChartProvider>
+	);
+}
+```
+
+`recharts` is an optional peer dependency on the package, but any consumer that
+imports `@pikaboo/t2-design-system/charts` or the report chart wrappers must
+install a compatible version (`>=2.13.0 <4`). Optima already has Recharts in its
+dependency tree.
 
 Plain JSX report blocks:
 

@@ -16,6 +16,7 @@ describe('component usage Storybook inventory', () => {
 			'Feedback',
 			'Navigation',
 			'Data Display',
+			'Charts',
 			'Campaign',
 			'Reports',
 			'Auth',
@@ -35,6 +36,9 @@ describe('component usage Storybook inventory', () => {
 		);
 		expect(byTitle.get('Report Blocks')?.reactPackage).toBe(
 			'@pikaboo/t2-design-system/report',
+		);
+		expect(byTitle.get('Charts and BI Components')?.reactPackage).toBe(
+			'@pikaboo/t2-design-system/charts',
 		);
 		expect(byTitle.get('Raw Report JSX')?.rawPackage).toBe(
 			'@pikaboo/t2-design-system/report-jsx',

@@ -28,6 +28,8 @@ export default defineConfig({
 					__dirname,
 					'src/auth-jsx/jsx-runtime.ts',
 				),
+				charts: resolve(__dirname, 'src/charts.ts'),
+				'charts-core': resolve(__dirname, 'src/charts-core.ts'),
 				index: resolve(__dirname, 'src/index.ts'),
 				'marketing-jsx': resolve(__dirname, 'src/marketing-jsx.ts'),
 				'marketing-jsx/jsx-dev-runtime': resolve(
@@ -56,13 +58,14 @@ export default defineConfig({
 			cssFileName: 'styles',
 		},
 		rollupOptions: {
-			external: ['react', 'react-dom', 'react/jsx-runtime'],
+			external: ['react', 'react-dom', 'react/jsx-runtime', 'recharts'],
 			output: {
 				exports: 'named',
 				globals: {
 					react: 'React',
 					'react-dom': 'ReactDOM',
 					'react/jsx-runtime': 'reactJsxRuntime',
+					recharts: 'Recharts',
 				},
 			},
 		},

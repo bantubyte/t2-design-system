@@ -23,6 +23,12 @@ import { Badge, type BadgeTone } from './badge';
 import { Button, type ButtonProps } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import {
+	BarList as ChartBarList,
+	LineChart as ChartLineChart,
+	PieChart as ChartPieChart,
+	Sparkline as ChartSparkline,
+} from './charts';
+import {
 	CardLoadingState,
 	type LoaderMotion,
 	LoadingState,
@@ -1159,6 +1165,13 @@ const getNumbers = getReportNumbers;
 const getRange = getReportRange;
 const pointsToPath = createReportSeriesPath;
 
+const reportNodeToText = (value: ReactNode): string => {
+	if (typeof value === 'string' || typeof value === 'number') {
+		return String(value);
+	}
+	return '';
+};
+
 export interface ReportShellProps extends HTMLAttributes<HTMLDivElement> {
 	footer?: ReactNode;
 	header?: ReactNode;
@@ -1289,25 +1302,16 @@ export function ReportSparkline({
 	width = 112,
 	...props
 }: ReportSparklineProps) {
-	const actualPath = pointsToPath(values, width, height);
-	const forecastPath = forecast ? pointsToPath(forecast, width, height) : '';
-
 	return (
-		<svg
-			aria-hidden="true"
+		<ChartSparkline
+			aria-hidden
 			className={cx('pds-report-sparkline', className)}
+			forecast={forecast}
 			height={height}
-			viewBox={`0 0 ${width} ${height}`}
+			values={values}
 			width={width}
-			{...props}
-		>
-			{forecastPath ? (
-				<path className="pds-report-sparkline__forecast" d={forecastPath} />
-			) : null}
-			{actualPath ? (
-				<path className="pds-report-sparkline__actual" d={actualPath} />
-			) : null}
-		</svg>
+			{...(props as HTMLAttributes<HTMLDivElement>)}
+		/>
 	);
 }
 
@@ -1399,6 +1403,16 @@ export function ReportTrendChart({
 	const { max } = getRange(allValues);
 	const actualNumbers = getNumbers(actual);
 	const lastActual = actualNumbers[actualNumbers.length - 1];
+	const chartData = Array.from(
+		{ length: Math.max(actual.length, forecast?.length ?? 0) },
+		(_, index) => ({
+			actual: actual[index],
+			forecast: forecast?.[index],
+			index: index + 1,
+		}),
+	);
+	const formatChartValue = (value: unknown) =>
+		typeof value === 'number' ? reportNodeToText(formatValue(value)) : '';
 
 	return (
 		<Card className={cx('pds-report-trend', className)} {...props}>
@@ -1409,26 +1423,21 @@ export function ReportTrendChart({
 				) : null}
 			</CardHeader>
 			<CardContent>
-				<div className="pds-report-trend__chart">
-					<svg preserveAspectRatio="none" viewBox="0 0 700 220">
-						<path
-							className="pds-report-trend__grid"
-							d="M 0 55 H 700 M 0 110 H 700 M 0 165 H 700"
-						/>
-						{forecast ? (
-							<path
-								className="pds-report-trend__forecast"
-								d={pointsToPath(forecast, 700, 200)}
-								transform="translate(0 10)"
-							/>
-						) : null}
-						<path
-							className="pds-report-trend__actual"
-							d={pointsToPath(actual, 700, 200)}
-							transform="translate(0 10)"
-						/>
-					</svg>
-				</div>
+				<ChartLineChart
+					ariaLabel={typeof label === 'string' ? label : 'Report trend chart'}
+					className="pds-report-trend__chart"
+					data={chartData}
+					height={220}
+					series={[
+						{ key: 'actual', label: 'Actual' },
+						...(forecast
+							? [{ key: 'forecast', label: 'Forecast', strokeDasharray: '8 6' }]
+							: []),
+					]}
+					showLegend={false}
+					xKey="index"
+					yFormat={formatChartValue}
+				/>
 				<div className="pds-report-trend__legend">
 					<span>Actual</span>
 					{forecast ? <span>Forecast</span> : null}
@@ -1460,8 +1469,6 @@ export function ReportBarList({
 	title,
 	...props
 }: ReportBarListProps) {
-	const maxValue = Math.max(...items.map((item) => item.value), 1);
-
 	return (
 		<Card className={cx('pds-report-bar-list', className)} {...props}>
 			{title ? (
@@ -1470,24 +1477,15 @@ export function ReportBarList({
 				</CardHeader>
 			) : null}
 			<CardContent>
-				{items.map((item, index) => (
-					<div className="pds-report-bar-list__row" key={index}>
-						<span className="pds-report-bar-list__label">{item.label}</span>
-						<span className="pds-report-bar-list__track">
-							<span
-								className={cx(
-									'pds-report-bar-list__bar',
-									item.tone && `pds-report-bar-list__bar--${item.tone}`,
-								)}
-								style={{
-									width: `${Math.round((item.value / maxValue) * 100)}%`,
-								}}
-							/>
-						</span>
-						<strong>{formatValue(item.value)}</strong>
-						{item.meta ? <small>{item.meta}</small> : null}
-					</div>
-				))}
+				<ChartBarList
+					ariaLabel={typeof title === 'string' ? title : 'Report bar list'}
+					formatValue={(value) =>
+						typeof value === 'number'
+							? reportNodeToText(formatValue(value))
+							: String(value ?? '')
+					}
+					items={items}
+				/>
 			</CardContent>
 		</Card>
 	);
@@ -1513,9 +1511,10 @@ export function ReportDonut({
 	...props
 }: ReportDonutProps) {
 	const total = segments.reduce((sum, segment) => sum + segment.value, 0) || 1;
-	const radius = 42;
-	const circumference = 2 * Math.PI * radius;
-	let offset = 0;
+	const chartData = segments.map((segment, index) => ({
+		label: reportNodeToText(segment.label) || `Segment ${index + 1}`,
+		value: segment.value,
+	}));
 
 	return (
 		<Card className={cx('pds-report-donut', className)} {...props}>
@@ -1526,45 +1525,17 @@ export function ReportDonut({
 			) : null}
 			<CardContent>
 				<div className="pds-report-donut__layout">
-					<svg role="img" viewBox="0 0 120 120">
-						<title>{typeof title === 'string' ? title : 'Donut chart'}</title>
-						<circle
-							className="pds-report-donut__track"
-							cx="60"
-							cy="60"
-							r={radius}
-						/>
-						{segments.map((segment, index) => {
-							const dash = (segment.value / total) * circumference;
-							const strokeDasharray = `${dash} ${circumference - dash}`;
-							const strokeDashoffset = -offset;
-							offset += dash;
-							return (
-								<circle
-									className={`pds-report-donut__segment pds-report-donut__segment--${index + 1}`}
-									cx="60"
-									cy="60"
-									key={index}
-									r={radius}
-									strokeDasharray={strokeDasharray}
-									strokeDashoffset={strokeDashoffset}
-								/>
-							);
-						})}
-						{centerLabel ? (
-							<>
-								<circle
-									className="pds-report-donut__center-bg"
-									cx="60"
-									cy="60"
-									r={radius - 12}
-								/>
-								<text className="pds-report-donut__center" x="60" y="64">
-									{centerLabel}
-								</text>
-							</>
-						) : null}
-					</svg>
+					<ChartPieChart
+						ariaLabel={typeof title === 'string' ? title : 'Report donut chart'}
+						centerLabel={reportNodeToText(centerLabel)}
+						className="pds-report-donut__chart"
+						data={chartData}
+						height={150}
+						nameKey="label"
+						showLegend={false}
+						valueKey="value"
+						variant="donut"
+					/>
 					<div className="pds-report-donut__legend">
 						{segments.map((segment, index) => (
 							<div key={index}>
