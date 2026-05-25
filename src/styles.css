@@ -3075,7 +3075,22 @@
 }
 
 .pds-campaign-setup-workspace__footer {
+	position: sticky;
+	bottom: 0;
+	z-index: 40;
 	grid-column: 1 / -1;
+	/* Break out of standard container padding to span full width */
+	width: calc(100% + 4rem);
+	padding: 1rem 2rem;
+	margin-top: 2rem;
+	margin-right: -2rem;
+	margin-bottom: -1.5rem;
+	margin-left: -2rem;
+	background: var(--theme-surface, #ffffff);
+	border-top: 1px solid var(--theme-border, #e2e8f0);
+	box-shadow:
+		0 -4px 6px -1px rgba(0, 0, 0, 0.05),
+		0 -2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 .pds-campaign-control-card {
@@ -6469,6 +6484,10 @@
 
 	.pds-campaign-setup-workspace__footer {
 		grid-column: auto;
+		width: calc(100% + 2rem);
+		padding: 0.75rem 1rem;
+		margin-right: -1rem;
+		margin-left: -1rem;
 	}
 
 	.pds-campaign-list-toolbar__actions,
