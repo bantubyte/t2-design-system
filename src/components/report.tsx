@@ -1997,12 +1997,19 @@ export function ReportActualForecastChart({
 							/>
 						)}
 						<Line
+							activeDot={{
+								cursor: 'pointer',
+								fill: FORECAST_COLOR,
+								r: 5,
+								stroke: '#f5c842',
+								strokeWidth: 2.5,
+							}}
 							dataKey="forecast"
 							dot={{
-								fill: '#fff',
-								r: 3,
+								fill: FORECAST_COLOR,
+								r: 3.5,
 								stroke: FORECAST_COLOR,
-								strokeWidth: 2,
+								strokeWidth: 0,
 							}}
 							name="forecast"
 							stroke={FORECAST_COLOR}
@@ -2021,23 +2028,22 @@ export function ReportActualForecastChart({
 						<span className="text-xs font-medium text-gray-600">Actual</span>
 					</div>
 					<div className="flex items-center gap-1.5">
-						<svg height="12" width="20">
+						<svg height="12" width="22">
 							<line
 								stroke={FORECAST_COLOR}
 								strokeDasharray="4 3"
 								strokeWidth="2"
 								x1="0"
-								x2="20"
+								x2="22"
 								y1="6"
 								y2="6"
 							/>
 							<circle
-								cx="10"
+								cx="11"
 								cy="6"
-								fill="#fff"
-								r="3"
-								stroke={FORECAST_COLOR}
-								strokeWidth="2"
+								fill={FORECAST_COLOR}
+								r="3.5"
+								stroke="none"
 							/>
 						</svg>
 						<span className="text-xs font-medium text-gray-600">Forecast</span>
@@ -2062,6 +2068,235 @@ export interface ReportSiteBarListProps
 	title?: ReactNode;
 }
 
+// ---------------------------------------------------------------------------
+// Insights page skeleton components
+// ---------------------------------------------------------------------------
+
+const INSIGHTS_CHART_BAR_HEIGHTS = [48, 65, 38, 80, 55, 72] as const;
+
+export interface InsightsChartLoadingCardProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	title?: ReactNode;
+}
+
+export function InsightsChartLoadingCard({
+	className,
+	title,
+	...props
+}: InsightsChartLoadingCardProps) {
+	return (
+		<Card
+			className={cx(
+				'rounded-2xl border border-pikaboo-purple/10 bg-white/90 shadow-pikaboo-card',
+				className,
+			)}
+			{...props}
+		>
+			{title ? (
+				<CardHeader className="pb-2">
+					<CardTitle className="text-sm font-semibold text-pikaboo-slate">
+						{title}
+					</CardTitle>
+				</CardHeader>
+			) : null}
+			<CardContent>
+				<div className="relative h-[260px] overflow-hidden rounded-2xl border border-pikaboo-purple/10 bg-pikaboo-purple/5">
+					<div className="p-6">
+						<div className="flex items-center gap-2">
+							<Skeleton
+								height="0.5rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
+								width="2.5rem"
+							/>
+							<Skeleton
+								height="0.5rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
+								width="4rem"
+							/>
+						</div>
+						<div
+							className="mt-6 grid items-end gap-2"
+							style={{ gridTemplateColumns: 'repeat(6, 1fr)', height: 170 }}
+						>
+							{INSIGHTS_CHART_BAR_HEIGHTS.map((barHeight, index) => (
+								<Skeleton
+									key={index}
+									radius="lg"
+									style={{
+										backgroundColor: 'rgba(255,255,255,0.8)',
+										height: `${barHeight}%`,
+									}}
+								/>
+							))}
+						</div>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+export function InsightsCampaignSummaryLoading({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className={cx(
+				'flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between',
+				className,
+			)}
+			{...props}
+		>
+			<div className="space-y-3">
+				<Skeleton height="0.75rem" width="6rem" />
+				<Skeleton height="2rem" width="12rem" />
+				<Skeleton height="1rem" width="10rem" />
+			</div>
+			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+				{[0, 1, 2].map((i) => (
+					<div
+						className="rounded-2xl border border-pikaboo-purple/10 bg-pikaboo-purple/5 px-4 py-3"
+						key={i}
+					>
+						<Skeleton height="0.75rem" width="5rem" />
+						<Skeleton className="mt-2" height="1.5rem" width="4rem" />
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+export interface InsightsAiInsightsLoadingProps
+	extends HTMLAttributes<HTMLDivElement> {
+	count?: number;
+}
+
+export function InsightsAiInsightsLoading({
+	className,
+	count = 2,
+	...props
+}: InsightsAiInsightsLoadingProps) {
+	return (
+		<div className={cx('space-y-3', className)} {...props}>
+			{Array.from({ length: count }, (_, i) => (
+				<div
+					className="rounded-xl border border-pikaboo-purple/10 bg-white/80 p-4"
+					key={i}
+				>
+					<Skeleton height="0.75rem" width="4rem" />
+					<Skeleton className="mt-3" height="1rem" width="100%" />
+					<Skeleton className="mt-2" height="1rem" width="75%" />
+				</div>
+			))}
+		</div>
+	);
+}
+
+export function InsightsPageLoading({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div className={cx('flex-1 overflow-auto', className)} {...props}>
+			<header className="sticky top-0 z-40 border-b border-pikaboo-purple/10 bg-white/95 backdrop-blur">
+				<div className="flex flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+					<div className="space-y-1">
+						<p className="text-xs font-semibold uppercase tracking-[0.2em] text-pikaboo-purple/70">
+							Enhanced Ads Reporting
+						</p>
+						<Skeleton height="2rem" width="6rem" />
+						<Skeleton height="1rem" width="16rem" />
+					</div>
+					<div className="flex flex-wrap items-center gap-3">
+						<div className="flex h-10 w-[220px] items-center justify-between rounded-xl border border-pikaboo-purple/20 bg-white/80 px-3 shadow-sm">
+							<span className="text-sm text-slate-400">Select Campaign</span>
+							<Skeleton height="1rem" width="1rem" />
+						</div>
+						<div className="flex h-10 w-[220px] items-center gap-2 rounded-xl border border-pikaboo-purple/20 bg-white/80 px-3 shadow-sm">
+							<Skeleton height="1rem" radius="full" width="1rem" />
+							<span className="text-sm text-slate-400">Date Range</span>
+						</div>
+						<div className="flex h-10 items-center gap-2 rounded-xl bg-pikaboo-purple px-4 opacity-60 shadow-sm">
+							<Skeleton
+								height="1rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.4)' }}
+								width="1rem"
+							/>
+							<span className="text-sm font-medium text-white">
+								Export to Excel
+							</span>
+						</div>
+					</div>
+				</div>
+			</header>
+			<main className="space-y-8 px-6 pb-10 pt-6">
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-6 shadow-sm">
+						<InsightsCampaignSummaryLoading />
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="7rem" />
+						<Skeleton className="mt-1" height="1rem" width="18rem" />
+					</div>
+					<div className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-6 shadow-sm">
+						<InsightsAiInsightsLoading />
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="8rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+						{['Reach', 'VAC', 'Reach %', 'Avg Freq', 'CPT', 'GRP'].map(
+							(metric) => (
+								<div
+									className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-4 shadow-sm"
+									key={metric}
+								>
+									<span className="text-sm text-slate-500">{metric}</span>
+									<Skeleton className="mt-2" height="2rem" width="5rem" />
+									<Skeleton className="mt-1" height="0.75rem" width="4rem" />
+								</div>
+							),
+						)}
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="18rem" />
+					</div>
+					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+						{['Reach', 'VAC', 'Average Frequency'].map((chart) => (
+							<InsightsChartLoadingCard key={chart} title={chart} />
+						))}
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+						{['Reach', 'VAC', 'Reach %', 'Avg Frequency'].map((metric) => (
+							<InsightsChartLoadingCard key={metric} title={metric} />
+						))}
+					</div>
+				</section>
+			</main>
+		</div>
+	);
+}
+
 export function ReportSiteBarList({
 	className,
 	formatValue = (value) => value,
@@ -2081,32 +2316,39 @@ export function ReportSiteBarList({
 			) : null}
 			<CardContent className="px-4 pb-4">
 				<div
-					className="flex flex-col gap-2 overflow-y-auto"
+					className="flex flex-col gap-3 overflow-y-auto pr-3 [scrollbar-color:theme(colors.gray.300)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent"
 					style={{ maxHeight: 320 }}
 				>
 					{sorted.map((item) => (
 						<div
-							className="flex flex-col gap-1"
+							className="flex flex-col gap-1.5"
 							data-testid="site-bar-item"
 							key={item.id}
 						>
 							<div className="flex items-center justify-between gap-2">
 								<span
-									className="truncate text-sm text-gray-700"
+									className="truncate text-sm text-gray-600"
 									data-testid="site-bar-label"
+									title={
+										typeof item.label === 'string' ? item.label : undefined
+									}
 								>
 									{item.label}
 								</span>
-								<strong className="shrink-0 text-sm font-semibold text-gray-900">
+								<span className="shrink-0 text-sm font-medium text-gray-700">
 									{formatValue(item.value)}
-								</strong>
+								</span>
 							</div>
-							<div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+							<div
+								className="w-full overflow-hidden rounded-full bg-gray-200"
+								style={{ height: 14 }}
+							>
 								<div
 									className="h-full rounded-full transition-all"
 									style={{
 										backgroundColor:
 											item.color ?? 'var(--pds-color-primary-500)',
+										opacity: 0.85,
 										width: `${((item.value / max) * 100).toFixed(1)}%`,
 									}}
 								/>
