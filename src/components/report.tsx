@@ -6,6 +6,17 @@ import {
 	useState,
 } from 'react';
 import {
+	Area,
+	Bar,
+	CartesianGrid,
+	ComposedChart,
+	Line,
+	ResponsiveContainer,
+	Tooltip,
+	XAxis,
+	YAxis,
+} from 'recharts';
+import {
 	createReportComparisonModel,
 	createReportEvidenceModel,
 	createReportPlacementTableModel,
@@ -22,6 +33,7 @@ import { Badge, type BadgeTone } from './badge';
 import { Button, type ButtonProps } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import {
+	AreaChart as ChartAreaChart,
 	BarList as ChartBarList,
 	LineChart as ChartLineChart,
 	PieChart as ChartPieChart,
@@ -66,6 +78,7 @@ export interface ReportBlockProps
 	title?: ReactNode;
 	tone?: ReportTone;
 	variant?: ReportBlockVariant;
+	flat?: boolean;
 }
 
 export function ReportBlock({
@@ -80,8 +93,53 @@ export function ReportBlock({
 	title,
 	tone = 'neutral',
 	variant = 'default',
+	flat = false,
 	...props
 }: ReportBlockProps) {
+	if (flat) {
+		return (
+			<div
+				className={cx(
+					'pds-report-block',
+					'pds-report-block--flat',
+					`pds-report-block--${variant}`,
+					`pds-report-block--${tone}`,
+					selected && 'pds-report-block--selected',
+					className,
+				)}
+				{...props}
+			>
+				{eyebrow || title || description || actions ? (
+					<div className="pds-report-block__header">
+						<div>
+							{eyebrow ? (
+								<p className="pds-report-block__eyebrow">{eyebrow}</p>
+							) : null}
+							{title ? (
+								<h3
+									className="pds-card__title"
+									style={{ fontSize: '0.8125rem', fontWeight: 600 }}
+								>
+									{title}
+								</h3>
+							) : null}
+							{description ? (
+								<p className="pds-report-block__description">{description}</p>
+							) : null}
+						</div>
+						{actions ? (
+							<div className="pds-report-block__actions">{actions}</div>
+						) : null}
+					</div>
+				) : null}
+				<div className="pds-report-block__content">{children}</div>
+				{footer ? (
+					<div className="pds-report-block__footer">{footer}</div>
+				) : null}
+			</div>
+		);
+	}
+
 	return (
 		<Card
 			className={cx(
@@ -727,6 +785,9 @@ export interface ReportRankedListItem {
 	tone?: ReportTone;
 	value: number;
 	valueLabel?: ReactNode;
+	icon?: ReactNode;
+	badge?: ReactNode;
+	highlighted?: boolean;
 }
 
 export interface ReportRankedListBlockProps
@@ -744,6 +805,7 @@ export function ReportRankedListBlock({
 	onItemSelect,
 	selectedItemId,
 	title = 'Ranked list',
+	flat = false,
 	...props
 }: ReportRankedListBlockProps) {
 	const rankedList = createReportRankedListModel(items, selectedItemId);
@@ -751,6 +813,7 @@ export function ReportRankedListBlock({
 	return (
 		<ReportBlock
 			className={cx('pds-report-ranked-list', className)}
+			flat={flat}
 			title={title}
 			variant="chart"
 			{...props}
@@ -758,22 +821,42 @@ export function ReportRankedListBlock({
 			<div className="pds-report-ranked-list__items">
 				{rankedList.items.map((item) => {
 					const tone = item.tone ?? 'info';
+					const originalItem =
+						items.find((orig) => orig.id === item.id) || item;
+					const icon = (originalItem as any).icon;
+					const badge = (originalItem as any).badge;
+					const highlighted = (originalItem as any).highlighted;
+
 					return (
 						<button
 							aria-pressed={item.selected}
 							className={cx(
 								'pds-report-ranked-list__item',
 								item.selected && 'pds-report-ranked-list__item--selected',
+								highlighted && 'pds-report-ranked-list__item--highlighted',
 							)}
 							key={item.id}
 							onClick={() => onItemSelect?.(item)}
 							type="button"
 						>
-							<span
-								className={`pds-report-ranked-list__dot pds-report-ranked-list__dot--${tone}`}
-							/>
+							{icon ? (
+								<div className="pds-report-ranked-list__icon-container">
+									{icon}
+								</div>
+							) : (
+								<span
+									className={`pds-report-ranked-list__dot pds-report-ranked-list__dot--${tone}`}
+								/>
+							)}
 							<span className="pds-report-ranked-list__copy">
-								<strong>{item.label}</strong>
+								<span className="flex items-center gap-1.5">
+									<strong>{item.label}</strong>
+									{badge ? (
+										<span className="pds-report-ranked-list__item-badge">
+											{badge}
+										</span>
+									) : null}
+								</span>
 								{item.meta ? <small>{item.meta}</small> : null}
 							</span>
 							<span className="pds-report-ranked-list__track">
@@ -1451,6 +1534,7 @@ export interface ReportBarListItem {
 	meta?: ReactNode;
 	tone?: ReportTone;
 	value: number;
+	color?: string;
 }
 
 export interface ReportBarListProps
@@ -1458,6 +1542,7 @@ export interface ReportBarListProps
 	formatValue?: (value: number) => ReactNode;
 	items: readonly ReportBarListItem[];
 	title?: ReactNode;
+	flat?: boolean;
 }
 
 export function ReportBarList({
@@ -1465,8 +1550,49 @@ export function ReportBarList({
 	formatValue = (value) => value,
 	items,
 	title,
+	flat = false,
 	...props
 }: ReportBarListProps) {
+	const content = (
+		<ChartBarList
+			ariaLabel={typeof title === 'string' ? title : 'Report bar list'}
+			formatValue={(value) =>
+				typeof value === 'number'
+					? reportNodeToText(formatValue(value))
+					: String(value ?? '')
+			}
+			items={items}
+		/>
+	);
+
+	if (flat) {
+		return (
+			<div
+				className={cx(
+					'pds-report-bar-list',
+					'pds-report-bar-list--flat',
+					className,
+				)}
+				{...props}
+			>
+				{title ? (
+					<div
+						className="pds-report-block__header"
+						style={{ paddingBottom: '0.6rem' }}
+					>
+						<h3
+							className="pds-card__title"
+							style={{ fontSize: '0.8125rem', fontWeight: 600 }}
+						>
+							{title}
+						</h3>
+					</div>
+				) : null}
+				<div className="pds-report-block__content">{content}</div>
+			</div>
+		);
+	}
+
 	return (
 		<Card className={cx('pds-report-bar-list', className)} {...props}>
 			{title ? (
@@ -1474,17 +1600,7 @@ export function ReportBarList({
 					<CardTitle>{title}</CardTitle>
 				</CardHeader>
 			) : null}
-			<CardContent>
-				<ChartBarList
-					ariaLabel={typeof title === 'string' ? title : 'Report bar list'}
-					formatValue={(value) =>
-						typeof value === 'number'
-							? reportNodeToText(formatValue(value))
-							: String(value ?? '')
-					}
-					items={items}
-				/>
-			</CardContent>
+			<CardContent>{content}</CardContent>
 		</Card>
 	);
 }
@@ -1499,6 +1615,7 @@ export interface ReportDonutProps
 	centerLabel?: ReactNode;
 	segments: readonly ReportDonutSegment[];
 	title?: ReactNode;
+	flat?: boolean;
 }
 
 export function ReportDonut({
@@ -1506,6 +1623,7 @@ export function ReportDonut({
 	className,
 	segments,
 	title,
+	flat = false,
 	...props
 }: ReportDonutProps) {
 	const total = segments.reduce((sum, segment) => sum + segment.value, 0) || 1;
@@ -1514,6 +1632,57 @@ export function ReportDonut({
 		value: segment.value,
 	}));
 
+	const content = (
+		<div className="pds-report-donut__layout">
+			<ChartPieChart
+				ariaLabel={typeof title === 'string' ? title : 'Report donut chart'}
+				centerLabel={reportNodeToText(centerLabel)}
+				className="pds-report-donut__chart"
+				data={chartData}
+				height={150}
+				nameKey="label"
+				showLegend={false}
+				valueKey="value"
+				variant="donut"
+			/>
+			<div className="pds-report-donut__legend">
+				{segments.map((segment, index) => (
+					<div key={index}>
+						<span
+							className={`pds-report-donut__dot pds-report-donut__dot--${index + 1}`}
+						/>
+						<span>{segment.label}</span>
+						<strong>{Math.round((segment.value / total) * 100)}%</strong>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+
+	if (flat) {
+		return (
+			<div
+				className={cx('pds-report-donut', 'pds-report-donut--flat', className)}
+				{...props}
+			>
+				{title ? (
+					<div
+						className="pds-report-block__header"
+						style={{ paddingBottom: '0.5rem' }}
+					>
+						<h3
+							className="pds-card__title"
+							style={{ fontSize: '0.8125rem', fontWeight: 600 }}
+						>
+							{title}
+						</h3>
+					</div>
+				) : null}
+				<div className="pds-report-block__content">{content}</div>
+			</div>
+		);
+	}
+
 	return (
 		<Card className={cx('pds-report-donut', className)} {...props}>
 			{title ? (
@@ -1521,32 +1690,7 @@ export function ReportDonut({
 					<CardTitle>{title}</CardTitle>
 				</CardHeader>
 			) : null}
-			<CardContent>
-				<div className="pds-report-donut__layout">
-					<ChartPieChart
-						ariaLabel={typeof title === 'string' ? title : 'Report donut chart'}
-						centerLabel={reportNodeToText(centerLabel)}
-						className="pds-report-donut__chart"
-						data={chartData}
-						height={150}
-						nameKey="label"
-						showLegend={false}
-						valueKey="value"
-						variant="donut"
-					/>
-					<div className="pds-report-donut__legend">
-						{segments.map((segment, index) => (
-							<div key={index}>
-								<span
-									className={`pds-report-donut__dot pds-report-donut__dot--${index + 1}`}
-								/>
-								<span>{segment.label}</span>
-								<strong>{Math.round((segment.value / total) * 100)}%</strong>
-							</div>
-						))}
-					</div>
-				</div>
-			</CardContent>
+			<CardContent>{content}</CardContent>
 		</Card>
 	);
 }
@@ -1813,5 +1957,538 @@ export function ReportSourceFooter({
 			</div>
 			{right ? <span>{right}</span> : null}
 		</footer>
+	);
+}
+
+export interface ReportAreaChartItem {
+	label: string;
+	value: number | null | undefined;
+}
+
+export interface ReportAreaChartProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	formatValue?: (value: number) => ReactNode;
+	items: readonly ReportAreaChartItem[];
+	title?: ReactNode;
+}
+
+export function ReportAreaChart({
+	className,
+	formatValue = (value) => value,
+	items,
+	title,
+	...props
+}: ReportAreaChartProps) {
+	const chartData = items.map((item) => ({
+		label: item.label,
+		value: item.value,
+	}));
+	const formatChartValue = (value: unknown) =>
+		typeof value === 'number' ? reportNodeToText(formatValue(value)) : '';
+
+	return (
+		<Card className={cx('pds-report-area-chart', className)} {...props}>
+			{title ? (
+				<CardHeader>
+					<CardTitle>{title}</CardTitle>
+				</CardHeader>
+			) : null}
+			<CardContent>
+				<ChartAreaChart
+					ariaLabel={typeof title === 'string' ? title : 'Report area chart'}
+					className="pds-report-area-chart__chart"
+					data={chartData}
+					height={220}
+					series={[
+						{
+							key: 'value',
+							label: typeof title === 'string' ? title : 'Value',
+						},
+					]}
+					showLegend={false}
+					xKey="label"
+					yFormat={formatChartValue}
+				/>
+			</CardContent>
+		</Card>
+	);
+}
+
+export interface ReportActualForecastChartItem {
+	actual: number | null | undefined;
+	forecast: number | null | undefined;
+	fullDate?: string;
+	label: string;
+}
+
+export interface ReportActualForecastChartProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	formatValue?: (value: number) => ReactNode;
+	items: readonly ReportActualForecastChartItem[];
+	title?: ReactNode;
+}
+
+const ACTUAL_GRADIENT_ID = 'pds-actual-gradient';
+const ACTUAL_COLOR = '#7B8FE4';
+const FORECAST_COLOR = '#5B6FD4';
+const AREA_THRESHOLD = 14;
+
+function formatAxisTick(value: unknown): string {
+	if (typeof value !== 'number') return String(value);
+	if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+	if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
+	return value.toFixed(0);
+}
+
+export function ReportActualForecastChart({
+	className,
+	formatValue = (value) => value,
+	items,
+	title,
+	...props
+}: ReportActualForecastChartProps) {
+	const useArea = items.length >= AREA_THRESHOLD;
+
+	return (
+		<Card className={cx('pds-report-actual-forecast', className)} {...props}>
+			{title ? (
+				<CardHeader className="pb-2">
+					<CardTitle className="text-sm font-semibold">{title}</CardTitle>
+				</CardHeader>
+			) : null}
+			<CardContent className="px-2 pb-4">
+				<ResponsiveContainer height={260} width="100%">
+					<ComposedChart
+						data={items as unknown as Record<string, unknown>[]}
+						margin={{ bottom: 8, left: 0, right: 8, top: 8 }}
+					>
+						<defs>
+							<linearGradient
+								id={ACTUAL_GRADIENT_ID}
+								x1="0"
+								x2="0"
+								y1="0"
+								y2="1"
+							>
+								<stop
+									offset="0%"
+									stopColor={ACTUAL_COLOR}
+									stopOpacity={useArea ? 0.75 : 0.85}
+								/>
+								<stop
+									offset="100%"
+									stopColor={ACTUAL_COLOR}
+									stopOpacity={useArea ? 0.15 : 0.2}
+								/>
+							</linearGradient>
+						</defs>
+						<CartesianGrid
+							stroke="#e5e7eb"
+							strokeDasharray="4 6"
+							vertical={false}
+						/>
+						<XAxis
+							axisLine={false}
+							dataKey="label"
+							tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 600 }}
+							tickLine={false}
+						/>
+						<YAxis
+							axisLine={false}
+							tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 600 }}
+							tickFormatter={formatAxisTick}
+							tickLine={false}
+							width={48}
+						/>
+						<Tooltip
+							formatter={(value: number | string, name: string) => [
+								typeof value === 'number'
+									? reportNodeToText(formatValue(value))
+									: String(value),
+								name === 'actual' ? 'Actual' : 'Forecast',
+							]}
+							labelStyle={{ fontWeight: 600 }}
+						/>
+						{useArea ? (
+							<Area
+								dataKey="actual"
+								dot={false}
+								fill={`url(#${ACTUAL_GRADIENT_ID})`}
+								name="actual"
+								stroke={ACTUAL_COLOR}
+								strokeWidth={2}
+								type="monotone"
+							/>
+						) : (
+							<Bar
+								barSize={12}
+								dataKey="actual"
+								fill={`url(#${ACTUAL_GRADIENT_ID})`}
+								name="actual"
+								radius={[4, 4, 0, 0]}
+							/>
+						)}
+						<Line
+							activeDot={{
+								cursor: 'pointer',
+								fill: FORECAST_COLOR,
+								r: 5,
+								stroke: '#f5c842',
+								strokeWidth: 2.5,
+							}}
+							dataKey="forecast"
+							dot={{
+								fill: FORECAST_COLOR,
+								r: 3.5,
+								stroke: FORECAST_COLOR,
+								strokeWidth: 0,
+							}}
+							name="forecast"
+							stroke={FORECAST_COLOR}
+							strokeDasharray="5 4"
+							strokeWidth={2}
+							type="monotone"
+						/>
+					</ComposedChart>
+				</ResponsiveContainer>
+				<div className="mt-2 flex items-center justify-center gap-6">
+					<div className="flex items-center gap-1.5">
+						<span
+							className="inline-block h-3 w-4 rounded-sm"
+							style={{ background: ACTUAL_COLOR, opacity: 0.7 }}
+						/>
+						<span className="text-xs font-medium text-gray-600">Actual</span>
+					</div>
+					<div className="flex items-center gap-1.5">
+						<svg height="12" width="22">
+							<line
+								stroke={FORECAST_COLOR}
+								strokeDasharray="4 3"
+								strokeWidth="2"
+								x1="0"
+								x2="22"
+								y1="6"
+								y2="6"
+							/>
+							<circle
+								cx="11"
+								cy="6"
+								fill={FORECAST_COLOR}
+								r="3.5"
+								stroke="none"
+							/>
+						</svg>
+						<span className="text-xs font-medium text-gray-600">Forecast</span>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+export interface ReportSiteBarListItem {
+	color?: string;
+	id: string;
+	label: ReactNode;
+	value: number;
+}
+
+export interface ReportSiteBarListProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	formatValue?: (value: number) => ReactNode;
+	items: readonly ReportSiteBarListItem[];
+	title?: ReactNode;
+}
+
+// ---------------------------------------------------------------------------
+// Insights page skeleton components
+// ---------------------------------------------------------------------------
+
+const INSIGHTS_CHART_BAR_HEIGHTS = [48, 65, 38, 80, 55, 72] as const;
+
+export interface InsightsChartLoadingCardProps
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+	title?: ReactNode;
+}
+
+export function InsightsChartLoadingCard({
+	className,
+	title,
+	...props
+}: InsightsChartLoadingCardProps) {
+	return (
+		<Card
+			className={cx(
+				'rounded-2xl border border-pikaboo-purple/10 bg-white/90 shadow-pikaboo-card',
+				className,
+			)}
+			{...props}
+		>
+			{title ? (
+				<CardHeader className="pb-2">
+					<CardTitle className="text-sm font-semibold text-pikaboo-slate">
+						{title}
+					</CardTitle>
+				</CardHeader>
+			) : null}
+			<CardContent>
+				<div className="relative h-[260px] overflow-hidden rounded-2xl border border-pikaboo-purple/10 bg-pikaboo-purple/5">
+					<div className="p-6">
+						<div className="flex items-center gap-2">
+							<Skeleton
+								height="0.5rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
+								width="2.5rem"
+							/>
+							<Skeleton
+								height="0.5rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
+								width="4rem"
+							/>
+						</div>
+						<div
+							className="mt-6 grid items-end gap-2"
+							style={{ gridTemplateColumns: 'repeat(6, 1fr)', height: 170 }}
+						>
+							{INSIGHTS_CHART_BAR_HEIGHTS.map((barHeight, index) => (
+								<Skeleton
+									key={index}
+									radius="lg"
+									style={{
+										backgroundColor: 'rgba(255,255,255,0.8)',
+										height: `${barHeight}%`,
+									}}
+								/>
+							))}
+						</div>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+export function InsightsCampaignSummaryLoading({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className={cx(
+				'flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between',
+				className,
+			)}
+			{...props}
+		>
+			<div className="space-y-3">
+				<Skeleton height="0.75rem" width="6rem" />
+				<Skeleton height="2rem" width="12rem" />
+				<Skeleton height="1rem" width="10rem" />
+			</div>
+			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+				{[0, 1, 2].map((i) => (
+					<div
+						className="rounded-2xl border border-pikaboo-purple/10 bg-pikaboo-purple/5 px-4 py-3"
+						key={i}
+					>
+						<Skeleton height="0.75rem" width="5rem" />
+						<Skeleton className="mt-2" height="1.5rem" width="4rem" />
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
+
+export interface InsightsAiInsightsLoadingProps
+	extends HTMLAttributes<HTMLDivElement> {
+	count?: number;
+}
+
+export function InsightsAiInsightsLoading({
+	className,
+	count = 2,
+	...props
+}: InsightsAiInsightsLoadingProps) {
+	return (
+		<div className={cx('space-y-3', className)} {...props}>
+			{Array.from({ length: count }, (_, i) => (
+				<div
+					className="rounded-xl border border-pikaboo-purple/10 bg-white/80 p-4"
+					key={i}
+				>
+					<Skeleton height="0.75rem" width="4rem" />
+					<Skeleton className="mt-3" height="1rem" width="100%" />
+					<Skeleton className="mt-2" height="1rem" width="75%" />
+				</div>
+			))}
+		</div>
+	);
+}
+
+export function InsightsPageLoading({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div className={cx('flex-1 overflow-auto', className)} {...props}>
+			<header className="sticky top-0 z-40 border-b border-pikaboo-purple/10 bg-white/95 backdrop-blur">
+				<div className="flex flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+					<div className="space-y-1">
+						<p className="text-xs font-semibold uppercase tracking-[0.2em] text-pikaboo-purple/70">
+							Enhanced Ads Reporting
+						</p>
+						<Skeleton height="2rem" width="6rem" />
+						<Skeleton height="1rem" width="16rem" />
+					</div>
+					<div className="flex flex-wrap items-center gap-3">
+						<div className="flex h-10 w-[220px] items-center justify-between rounded-xl border border-pikaboo-purple/20 bg-white/80 px-3 shadow-sm">
+							<span className="text-sm text-slate-400">Select Campaign</span>
+							<Skeleton height="1rem" width="1rem" />
+						</div>
+						<div className="flex h-10 w-[220px] items-center gap-2 rounded-xl border border-pikaboo-purple/20 bg-white/80 px-3 shadow-sm">
+							<Skeleton height="1rem" radius="full" width="1rem" />
+							<span className="text-sm text-slate-400">Date Range</span>
+						</div>
+						<div className="flex h-10 items-center gap-2 rounded-xl bg-pikaboo-purple px-4 opacity-60 shadow-sm">
+							<Skeleton
+								height="1rem"
+								style={{ backgroundColor: 'rgba(255,255,255,0.4)' }}
+								width="1rem"
+							/>
+							<span className="text-sm font-medium text-white">
+								Export to Excel
+							</span>
+						</div>
+					</div>
+				</div>
+			</header>
+			<main className="space-y-8 px-6 pb-10 pt-6">
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-6 shadow-sm">
+						<InsightsCampaignSummaryLoading />
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="7rem" />
+						<Skeleton className="mt-1" height="1rem" width="18rem" />
+					</div>
+					<div className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-6 shadow-sm">
+						<InsightsAiInsightsLoading />
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="8rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+						{['Reach', 'VAC', 'Reach %', 'Avg Freq', 'CPT', 'GRP'].map(
+							(metric) => (
+								<div
+									className="rounded-2xl border border-pikaboo-purple/10 bg-white/90 p-4 shadow-sm"
+									key={metric}
+								>
+									<span className="text-sm text-slate-500">{metric}</span>
+									<Skeleton className="mt-2" height="2rem" width="5rem" />
+									<Skeleton className="mt-1" height="0.75rem" width="4rem" />
+								</div>
+							),
+						)}
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="18rem" />
+					</div>
+					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+						{['Reach', 'VAC', 'Average Frequency'].map((chart) => (
+							<InsightsChartLoadingCard key={chart} title={chart} />
+						))}
+					</div>
+				</section>
+				<section className="space-y-4">
+					<div>
+						<Skeleton height="1.5rem" width="11rem" />
+						<Skeleton className="mt-1" height="1rem" width="16rem" />
+					</div>
+					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+						{['Reach', 'VAC', 'Reach %', 'Avg Frequency'].map((metric) => (
+							<InsightsChartLoadingCard key={metric} title={metric} />
+						))}
+					</div>
+				</section>
+			</main>
+		</div>
+	);
+}
+
+export function ReportSiteBarList({
+	className,
+	formatValue = (value) => value,
+	items,
+	title,
+	...props
+}: ReportSiteBarListProps) {
+	const sorted = [...items].sort((a, b) => b.value - a.value);
+	const max = Math.max(...items.map((i) => i.value), 1);
+
+	return (
+		<Card className={cx('pds-report-site-bar-list', className)} {...props}>
+			{title ? (
+				<CardHeader className="pb-2">
+					<CardTitle className="text-sm font-semibold">{title}</CardTitle>
+				</CardHeader>
+			) : null}
+			<CardContent className="px-4 pb-4">
+				<div
+					className="flex flex-col gap-3 overflow-y-auto pr-3 [scrollbar-color:theme(colors.gray.300)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent"
+					style={{ maxHeight: 320 }}
+				>
+					{sorted.map((item) => (
+						<div
+							className="flex flex-col gap-1.5"
+							data-testid="site-bar-item"
+							key={item.id}
+						>
+							<div className="flex items-center justify-between gap-2">
+								<span
+									className="truncate text-sm text-gray-600"
+									data-testid="site-bar-label"
+									title={
+										typeof item.label === 'string' ? item.label : undefined
+									}
+								>
+									{item.label}
+								</span>
+								<span className="shrink-0 text-sm font-medium text-gray-700">
+									{formatValue(item.value)}
+								</span>
+							</div>
+							<div
+								className="w-full overflow-hidden rounded-full bg-gray-200"
+								style={{ height: 14 }}
+							>
+								<div
+									className="h-full rounded-full transition-all"
+									style={{
+										backgroundColor:
+											item.color ?? 'var(--pds-color-primary-500)',
+										opacity: 0.85,
+										width: `${((item.value / max) * 100).toFixed(1)}%`,
+									}}
+								/>
+							</div>
+						</div>
+					))}
+				</div>
+			</CardContent>
+		</Card>
 	);
 }

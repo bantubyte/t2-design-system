@@ -5,6 +5,7 @@ import {
 	Badge,
 	Button,
 	ReportActionCard,
+	ReportAreaChart,
 	ReportBarList,
 	ReportBlock,
 	ReportBlockGrid,
@@ -41,6 +42,23 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+const dailyReachItems = [
+	{ label: '1 May', value: 48_200 },
+	{ label: '2 May', value: 51_400 },
+	{ label: '3 May', value: 44_800 },
+	{ label: '4 May', value: 62_100 },
+	{ label: '5 May', value: 71_300 },
+	{ label: '6 May', value: 80_500 },
+	{ label: '7 May', value: 73_900 },
+	{ label: '8 May', value: 55_200 },
+	{ label: '9 May', value: 58_700 },
+	{ label: '10 May', value: 64_400 },
+	{ label: '11 May', value: 69_800 },
+	{ label: '12 May', value: 78_600 },
+	{ label: '13 May', value: 85_100 },
+	{ label: '14 May', value: 91_300 },
+];
 
 const actualReach = [
 	120_000, 180_000, 260_000, 360_000, 500_000, 690_000, 890_000, 1_120_000,
@@ -590,6 +608,23 @@ export const Workbench: Story = {
 	play: async ({ canvas }) => {
 		await expect(
 			canvas.getByRole('heading', { name: /interactive report blocks/i }),
+		).toBeVisible();
+	},
+};
+
+export const AreaChart: Story = {
+	render: () => (
+		<div style={{ padding: '2rem', width: 480 }}>
+			<ReportAreaChart
+				formatValue={formatShort}
+				items={dailyReachItems}
+				title="Daily Reach"
+			/>
+		</div>
+	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('heading', { name: /daily reach/i }),
 		).toBeVisible();
 	},
 };

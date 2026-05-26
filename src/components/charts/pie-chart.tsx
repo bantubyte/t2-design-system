@@ -37,7 +37,7 @@ export interface PieChartProps<T extends ChartDatum>
 		ChartStatusProps {
 	centerLabel?: string;
 	data: readonly T[];
-	innerRadius?: number;
+	innerRadius?: number | string;
 	nameKey: ChartDataKey<T> | string;
 	palette?: ChartPaletteName;
 	showLegend?: boolean;
@@ -119,7 +119,7 @@ function PieChartContent<T extends ChartDatum>({
 								data={toChartData(data)}
 								dataKey={String(valueKey)}
 								innerRadius={
-									variant === 'donut' ? (innerRadius ?? 58) : innerRadius
+									variant === 'donut' ? (innerRadius ?? '65%') : innerRadius
 								}
 								nameKey={String(nameKey)}
 								outerRadius="82%"

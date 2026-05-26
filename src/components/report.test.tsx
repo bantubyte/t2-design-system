@@ -1,10 +1,12 @@
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import {
+	ReportActualForecastChart,
 	ReportComparisonBlock,
 	ReportEvidenceList,
 	ReportMetricTile,
 	ReportPlacementTable,
+	ReportSiteBarList,
 	ReportTourCallout,
 } from './report';
 
@@ -187,5 +189,37 @@ describe('report component interactions', () => {
 		keyDown(row, 'Enter');
 
 		expect(selectedRows).toEqual(['spec-607', 'spec-607']);
+	});
+});
+
+describe('ReportActualForecastChart', () => {
+	it('renders title', () => {
+		globalThis.ResizeObserver = class {
+			observe() {}
+			unobserve() {}
+			disconnect() {}
+		};
+		const container = render(
+			<ReportActualForecastChart items={[]} title="Reach" />,
+		);
+		expect(
+			container.querySelector('.pds-report-actual-forecast'),
+		).not.toBeNull();
+	});
+});
+
+describe('ReportSiteBarList', () => {
+	it('renders sorted items with bars', () => {
+		const items = [
+			{ id: 'a', label: 'Site A', value: 100, color: 'red' },
+			{ id: 'b', label: 'Site B', value: 200, color: 'blue' },
+		];
+		const container = render(<ReportSiteBarList items={items} title="Reach" />);
+		const rows = container.querySelectorAll('[data-testid="site-bar-item"]');
+		expect(rows).toHaveLength(2);
+		// First rendered item should be the highest value (Site B, 200)
+		expect(
+			rows[0].querySelector('[data-testid="site-bar-label"]')?.textContent,
+		).toBe('Site B');
 	});
 });

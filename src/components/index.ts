@@ -7,6 +7,7 @@ export * from './calendar';
 export * from './campaign';
 export * from './card';
 export * from './command';
+export * from './dashboard';
 export * from './data-display';
 export * from './dialog';
 export * from './disclosure';
