@@ -520,6 +520,7 @@ export interface CampaignChoiceOption {
 	description?: ReactNode;
 	label: ReactNode;
 	value: string;
+	icon?: ReactNode;
 }
 
 export interface CampaignChoiceChipsProps
@@ -572,6 +573,80 @@ export function CampaignChoiceChips({
 					>
 						<span>{option.label}</span>
 						{option.description ? <small>{option.description}</small> : null}
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
+export interface CampaignChoiceTilesProps extends CampaignChoiceChipsProps {
+	size?: 'default' | 'compact';
+}
+
+export function CampaignChoiceTiles({
+	className,
+	defaultSelectedValues = [],
+	onSelectedValuesChange,
+	options,
+	selectedValues,
+	size = 'default',
+	...props
+}: CampaignChoiceTilesProps) {
+	const [uncontrolledValues, setUncontrolledValues] = useState(
+		() => new Set(defaultSelectedValues),
+	);
+	const currentValues = new Set(selectedValues ?? uncontrolledValues);
+	const toggleValue = (nextValue: string) => {
+		const nextValues = new Set(currentValues);
+		if (nextValues.has(nextValue)) {
+			nextValues.delete(nextValue);
+		} else {
+			nextValues.add(nextValue);
+		}
+		if (selectedValues === undefined) {
+			setUncontrolledValues(nextValues);
+		}
+		onSelectedValuesChange?.([...nextValues]);
+	};
+
+	return (
+		<div
+			className={cx(
+				'pds-campaign-choice-tiles',
+				size === 'compact' && 'pds-campaign-choice-tiles--compact',
+				className,
+			)}
+			{...props}
+		>
+			{options.map((option) => {
+				const selected = currentValues.has(option.value);
+				return (
+					<button
+						aria-pressed={selected}
+						className={cx(
+							'pds-campaign-choice-tile',
+							selected && 'pds-campaign-choice-tile--selected',
+						)}
+						key={option.value}
+						onClick={() => toggleValue(option.value)}
+						type="button"
+					>
+						{option.icon && (
+							<div className="pds-campaign-choice-tile__icon">
+								{option.icon}
+							</div>
+						)}
+						<span className="pds-campaign-choice-tile__content">
+							<span className="pds-campaign-choice-tile__label">
+								{option.label}
+							</span>
+							{option.description && (
+								<small className="pds-campaign-choice-tile__description">
+									{option.description}
+								</small>
+							)}
+						</span>
 					</button>
 				);
 			})}
@@ -1774,31 +1849,11 @@ export function CampaignPartialFlightsToggle({
 				className,
 			)}
 			htmlFor={id}
-			style={{
-				display: 'inline-flex',
-				alignItems: 'center',
-				gap: '0.5rem',
-				cursor: disabled ? 'not-allowed' : 'pointer',
-				opacity: disabled ? 0.6 : 1,
-				userSelect: 'none',
-			}}
 		>
-			<span
-				style={{
-					display: 'inline-flex',
-					alignItems: 'center',
-					gap: '0.25rem',
-					fontSize: '11px',
-					fontWeight: 500,
-					color: 'rgba(18, 18, 18, 0.6)',
-					letterSpacing: '-0.025em',
-				}}
-			>
+			<span className="pds-campaign-partial-toggle__label">
 				<span>Include partial flights</span>
 				<Tooltip content="Adds faces with hidden gaps in the campaign window. Pricing and metrics for these faces are already pro-rated to the available days.">
-					<span
-						style={{ display: 'inline-flex', color: 'rgba(18, 18, 18, 0.4)' }}
-					>
+					<span className="pds-campaign-partial-toggle__icon">
 						<Icon name="help" style={{ width: '12px', height: '12px' }} />
 					</span>
 				</Tooltip>

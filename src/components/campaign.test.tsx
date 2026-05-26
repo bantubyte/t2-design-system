@@ -3,11 +3,13 @@ import { createRoot, type Root } from 'react-dom/client';
 import {
 	Button,
 	CampaignChoiceChips,
+	CampaignChoiceTiles,
 	CampaignControlCard,
 	CampaignControlRow,
 	CampaignHierarchySelector,
 	CampaignListCard,
 	CampaignListToolbar,
+	CampaignPartialFlightsToggle,
 	CampaignRangeControl,
 	CampaignScheduleDialog,
 	CampaignSetupReviewRail,
@@ -348,5 +350,47 @@ describe('campaign workflow component interactions', () => {
 
 		expect(ranges[ranges.length - 1]).toEqual([20, 84]);
 		expect(chips[chips.length - 1]).toEqual(['female', 'male']);
+	});
+
+	it('supports uncontrolled and controlled state in CampaignChoiceTiles', () => {
+		const tiles: string[][] = [];
+		const container = render(
+			<CampaignChoiceTiles
+				defaultSelectedValues={['opt1']}
+				onSelectedValuesChange={(values) => tiles.push(values)}
+				options={[
+					{ label: 'Option 1', value: 'opt1', description: 'Desc 1' },
+					{ label: 'Option 2', value: 'opt2' },
+				]}
+			/>,
+		);
+
+		const buttons = container.querySelectorAll('button');
+		expect(buttons[0].getAttribute('aria-pressed')).toBe('true');
+		expect(buttons[1].getAttribute('aria-pressed')).toBe('false');
+
+		click(buttons[1]);
+		expect(tiles[tiles.length - 1]).toEqual(['opt1', 'opt2']);
+		expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
+
+		click(buttons[0]);
+		expect(tiles[tiles.length - 1]).toEqual(['opt2']);
+		expect(buttons[0].getAttribute('aria-pressed')).toBe('false');
+	});
+
+	it('supports toggling the partial flights switch', () => {
+		const toggles: boolean[] = [];
+		const container = render(
+			<CampaignPartialFlightsToggle
+				checked={false}
+				onChange={(val) => toggles.push(val)}
+			/>,
+		);
+
+		const toggleInput = container.querySelector('input[type="checkbox"]');
+		expect(toggleInput).toBeTruthy();
+
+		click(toggleInput);
+		expect(toggles[toggles.length - 1]).toBe(true);
 	});
 });
