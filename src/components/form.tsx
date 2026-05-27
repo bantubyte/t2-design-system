@@ -125,7 +125,7 @@ export const formatZarCurrency = (value: number): string =>
 export interface SliderProps
 	extends Omit<
 		InputHTMLAttributes<HTMLInputElement>,
-		'type' | 'value' | 'defaultValue' | 'onChange'
+		'type' | 'value' | 'defaultValue' | 'onChange' | 'size'
 	> {
 	defaultValue?: number;
 	formatValue?: (value: number) => ReactNode;
@@ -133,6 +133,7 @@ export interface SliderProps
 	max?: number;
 	min?: number;
 	onValueChange?: (value: number) => void;
+	size?: 'md' | 'lg';
 	step?: number;
 	value?: number;
 }
@@ -145,6 +146,7 @@ export function Slider({
 	max = 100,
 	min = 0,
 	onValueChange,
+	size = 'md',
 	step = 1,
 	value,
 	...props
@@ -166,7 +168,9 @@ export function Slider({
 	};
 
 	return (
-		<label className={cx('pds-slider', className)}>
+		<label
+			className={cx('pds-slider', size === 'lg' && 'pds-slider--lg', className)}
+		>
 			{label ? (
 				<span className="pds-slider__header">
 					<span>{label}</span>

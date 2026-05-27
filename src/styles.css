@@ -2019,6 +2019,36 @@
 	box-shadow: var(--theme-shadow-sm);
 }
 
+.pds-slider--lg {
+	gap: 0.75rem;
+}
+
+.pds-slider--lg .pds-slider__header,
+.pds-slider--lg .pds-slider__scale {
+	font-size: 0.9375rem;
+}
+
+.pds-slider--lg .pds-slider__track,
+.pds-slider--lg .pds-slider input {
+	height: 1.85rem;
+}
+
+.pds-slider--lg .pds-slider__track::before {
+	height: 0.6rem;
+}
+
+.pds-slider--lg input::-webkit-slider-thumb {
+	width: 1.6rem;
+	height: 1.6rem;
+	border-width: 4px;
+}
+
+.pds-slider--lg input::-moz-range-thumb {
+	width: 1.6rem;
+	height: 1.6rem;
+	border-width: 4px;
+}
+
 .pds-radio-card-group {
 	display: grid;
 	gap: 0.75rem;
@@ -11602,4 +11632,68 @@
 .pds-campaign-partial-toggle__icon {
 	display: inline-flex;
 	color: rgb(var(--theme-foreground-rgb) / 0.4);
+}
+
+.pds-select-field {
+	position: relative;
+	display: block;
+	width: 100%;
+}
+
+.pds-select-field__trigger {
+	width: 100%;
+	min-height: 2.5rem;
+	padding: 0 2.25rem 0 0.75rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font: 600 0.875rem / 1.2 var(--theme-font-ui);
+	color: var(--theme-foreground);
+	text-align: left;
+	white-space: nowrap;
+	cursor: pointer;
+	background-color: var(--theme-surface);
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--theme-foreground-muted) 50%),
+		linear-gradient(135deg, var(--theme-foreground-muted) 50%, transparent 50%);
+	background-repeat: no-repeat;
+	background-position:
+		calc(100% - 17px) 50%,
+		calc(100% - 12px) 50%;
+	background-size:
+		5px 5px,
+		5px 5px;
+	border: 1px solid var(--theme-border);
+	border-radius: var(--radius);
+	box-shadow: var(--theme-shadow-sm);
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease;
+}
+
+.pds-select-field__trigger:hover:not(:disabled) {
+	border-color: var(--theme-primary);
+}
+
+.pds-select-field__trigger--open,
+.pds-select-field__trigger:focus-visible {
+	outline: none;
+	border-color: var(--theme-primary);
+	box-shadow: 0 0 0 3px rgb(var(--theme-primary-rgb) / 0.14);
+}
+
+.pds-select-field__trigger--placeholder {
+	color: var(--theme-foreground-subtle);
+}
+
+.pds-select-field__trigger:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.pds-select-field__panel {
+	position: absolute;
+	top: calc(100% + 4px);
+	right: 0;
+	left: 0;
+	z-index: 40;
 }

@@ -6,8 +6,10 @@ import {
 	type KeyboardEvent,
 	type LabelHTMLAttributes,
 	type ReactNode,
+	useEffect,
 	useId,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { cx } from '../utils/class-names';
@@ -22,6 +24,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from './card';
+import { CommandMenu } from './command';
 import {
 	Dialog,
 	DialogBody,
@@ -1937,5 +1940,92 @@ export function CampaignPartialFlightsToggle({
 				onChange={(e: any) => onChange(e.target.checked)}
 			/>
 		</label>
+	);
+}
+
+export interface CampaignSelectOption {
+	label: string;
+	value: string;
+}
+
+export interface CampaignSelectFieldProps {
+	className?: string;
+	disabled?: boolean;
+	emptyLabel?: ReactNode;
+	onChange: (value: string) => void;
+	options: ReadonlyArray<CampaignSelectOption>;
+	placeholder?: string;
+	searchPlaceholder?: string;
+	value: string;
+}
+
+export function CampaignSelectField({
+	className,
+	disabled = false,
+	emptyLabel = 'No options found',
+	onChange,
+	options,
+	placeholder = 'Select…',
+	searchPlaceholder = 'Search…',
+	value,
+}: CampaignSelectFieldProps) {
+	const [open, setOpen] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
+
+	useEffect(() => {
+		if (!open) return;
+		const handler = (event: MouseEvent) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
+			) {
+				setOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handler);
+		return () => document.removeEventListener('mousedown', handler);
+	}, [open]);
+
+	const selectedLabel = options.find((o) => o.value === value)?.label;
+
+	const handleSelect = (nextValue: string) => {
+		onChange(nextValue);
+		setOpen(false);
+		triggerRef.current?.focus();
+	};
+
+	return (
+		<div className={cx('pds-select-field', className)} ref={containerRef}>
+			<button
+				aria-expanded={open}
+				aria-haspopup="listbox"
+				className={cx(
+					'pds-select-field__trigger',
+					open && 'pds-select-field__trigger--open',
+					!selectedLabel && 'pds-select-field__trigger--placeholder',
+				)}
+				disabled={disabled}
+				onClick={() => setOpen(!open)}
+				onKeyDown={(e) => {
+					if (e.key === 'Escape') setOpen(false);
+				}}
+				ref={triggerRef}
+				type="button"
+			>
+				{selectedLabel ?? placeholder}
+			</button>
+			{open && (
+				<div className="pds-select-field__panel">
+					<CommandMenu
+						emptyLabel={emptyLabel}
+						items={options}
+						onSelect={handleSelect}
+						placeholder={searchPlaceholder}
+						selectedValue={value}
+					/>
+				</div>
+			)}
+		</div>
 	);
 }
