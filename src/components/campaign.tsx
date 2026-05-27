@@ -654,6 +654,77 @@ export function CampaignChoiceTiles({
 	);
 }
 
+export interface CampaignCollapsibleFieldProps {
+	/** When false, the collapsed summary is shown instead of `children`. */
+	expanded: boolean;
+	/** Called when the user clicks the collapsed summary to edit again. */
+	onExpand: () => void;
+	/** Icon rendered inside the tinted square of the summary. */
+	summaryIcon?: ReactNode;
+	/** Primary line of the collapsed summary. */
+	summaryTitle: ReactNode;
+	/** Optional secondary line of the collapsed summary. */
+	summaryDescription?: ReactNode;
+	/** Optional trailing content (e.g. a Badge) shown before the change action. */
+	summaryTrailing?: ReactNode;
+	/** Text for the change affordance. Defaults to "Change". */
+	changeLabel?: ReactNode;
+	/** Expanded content (e.g. a picker or choice grid). */
+	children: ReactNode;
+	className?: string;
+}
+
+/**
+ * A field that collapses to a compact, clickable summary once a value is
+ * chosen, and expands back to its full editing UI on demand. Selection and
+ * collapse timing are controlled by the caller via `expanded` / `onExpand`;
+ * this component owns only the presentation (summary card + entrance
+ * animation). Used for the campaign date range and objective pickers.
+ */
+export function CampaignCollapsibleField({
+	expanded,
+	onExpand,
+	summaryIcon,
+	summaryTitle,
+	summaryDescription,
+	summaryTrailing,
+	changeLabel = 'Change',
+	children,
+	className,
+}: CampaignCollapsibleFieldProps) {
+	if (expanded) {
+		return (
+			<div className={cx('pds-campaign-collapsible__panel', className)}>
+				{children}
+			</div>
+		);
+	}
+
+	return (
+		<button
+			className={cx('pds-campaign-collapsible__summary', className)}
+			onClick={onExpand}
+			type="button"
+		>
+			{summaryIcon ? (
+				<span className="pds-campaign-collapsible__icon">{summaryIcon}</span>
+			) : null}
+			<span className="pds-campaign-collapsible__body">
+				<span className="pds-campaign-collapsible__title">{summaryTitle}</span>
+				{summaryDescription ? (
+					<span className="pds-campaign-collapsible__description">
+						{summaryDescription}
+					</span>
+				) : null}
+			</span>
+			<span className="pds-campaign-collapsible__trailing">
+				{summaryTrailing}
+				<span className="pds-campaign-collapsible__change">{changeLabel}</span>
+			</span>
+		</button>
+	);
+}
+
 export interface CampaignHierarchyNode {
 	children?: readonly CampaignHierarchyNode[];
 	count?: ReactNode;

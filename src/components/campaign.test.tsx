@@ -4,6 +4,7 @@ import {
 	Button,
 	CampaignChoiceChips,
 	CampaignChoiceTiles,
+	CampaignCollapsibleField,
 	CampaignControlCard,
 	CampaignControlRow,
 	CampaignHierarchySelector,
@@ -392,5 +393,42 @@ describe('campaign workflow component interactions', () => {
 
 		click(toggleInput);
 		expect(toggles[toggles.length - 1]).toBe(true);
+	});
+
+	it('renders expanded children and hides the summary when expanded', () => {
+		const container = render(
+			<CampaignCollapsibleField
+				expanded
+				onExpand={() => {}}
+				summaryTitle="14 Jan → 28 Jan"
+			>
+				<div>expanded-content</div>
+			</CampaignCollapsibleField>,
+		);
+
+		expect(container.textContent).toContain('expanded-content');
+		expect(container.querySelector('button')).toBeNull();
+	});
+
+	it('shows a clickable summary that requests expansion when collapsed', () => {
+		let expandCount = 0;
+		const container = render(
+			<CampaignCollapsibleField
+				expanded={false}
+				onExpand={() => {
+					expandCount += 1;
+				}}
+				summaryTitle="14 Jan → 28 Jan"
+			>
+				<div>expanded-content</div>
+			</CampaignCollapsibleField>,
+		);
+
+		expect(container.textContent).not.toContain('expanded-content');
+		expect(container.textContent).toContain('14 Jan → 28 Jan');
+		expect(container.textContent).toContain('Change');
+
+		click(container.querySelector('button'));
+		expect(expandCount).toBe(1);
 	});
 });
