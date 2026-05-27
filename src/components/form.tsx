@@ -107,6 +107,21 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 
 Switch.displayName = 'Switch';
 
+const zarCurrencyFormatter = new Intl.NumberFormat('en-ZA', {
+	currency: 'ZAR',
+	maximumFractionDigits: 0,
+	style: 'currency',
+});
+
+/**
+ * Formats a numeric value as South African Rand with no decimal places, e.g.
+ * `2500000` → `R 2 500 000`. Handy as a `formatValue` for {@link Slider} when
+ * the slider represents a budget. Shared so currency presentation stays
+ * consistent across consumers.
+ */
+export const formatZarCurrency = (value: number): string =>
+	zarCurrencyFormatter.format(value);
+
 export interface SliderProps
 	extends Omit<
 		InputHTMLAttributes<HTMLInputElement>,

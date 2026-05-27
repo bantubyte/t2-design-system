@@ -1961,6 +1961,7 @@
 	font-size: 0.8125rem;
 	font-weight: 800;
 	color: var(--theme-foreground-muted);
+	white-space: nowrap;
 }
 
 .pds-slider__header strong {
@@ -3355,6 +3356,12 @@
 	border-radius: 8px;
 }
 
+.pds-campaign-choice-tiles--compact .pds-campaign-choice-tile__icon svg,
+.pds-campaign-choice-tiles--compact .pds-campaign-choice-tile__icon img {
+	width: 18px;
+	height: 18px;
+}
+
 .pds-campaign-choice-tiles--compact .pds-campaign-choice-tile__label {
 	font-size: 14px;
 }
@@ -3400,6 +3407,14 @@
 	color: var(--theme-primary);
 	background: rgb(var(--theme-primary-rgb) / 0.1);
 	border-radius: 12px;
+}
+
+/* Normalize icon size so logos render with consistent presence regardless of
+   the intrinsic size of the icon passed by the consumer. */
+.pds-campaign-choice-tile__icon svg,
+.pds-campaign-choice-tile__icon img {
+	width: 20px;
+	height: 20px;
 }
 
 .pds-campaign-choice-tile--selected .pds-campaign-choice-tile__icon {

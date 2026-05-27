@@ -256,7 +256,13 @@ export function Calendar({
 }
 
 export interface DateRangePreset {
-	getRange: () => DateRange;
+	/**
+	 * Builds the range for this preset. Receives the in-progress start date
+	 * (`anchor`) when one has been picked, so presets can anchor their range to
+	 * the user's selected start instead of always starting from today. Presets
+	 * that don't need it can ignore the argument.
+	 */
+	getRange: (anchor?: Date) => DateRange;
 	label: ReactNode;
 	value: string;
 }
@@ -340,7 +346,7 @@ export function DateRangePicker({
 				{presets.map((preset) => (
 					<button
 						key={preset.value}
-						onClick={() => setRange(preset.getRange())}
+						onClick={() => setRange(preset.getRange(selectedRange.from))}
 						type="button"
 					>
 						{preset.label}
