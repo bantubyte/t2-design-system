@@ -46,12 +46,45 @@ export function Field({
 	);
 }
 
-export const Input = forwardRef<
-	HTMLInputElement,
-	InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => (
-	<input className={cx('pds-input', className)} ref={ref} {...props} />
-));
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+	prefix?: ReactNode;
+	formatValue?: (raw: string) => string;
+}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+	({ className, formatValue, onChange, prefix, value, ...props }, ref) => {
+		const displayValue = formatValue
+			? formatValue(String(value ?? ''))
+			: value;
+
+		if (prefix) {
+			return (
+				<span className="pds-input-wrapper">
+					<span aria-hidden="true" className="pds-input__prefix">
+						{prefix}
+					</span>
+					<input
+						className={cx('pds-input pds-input--with-prefix', className)}
+						onChange={onChange}
+						ref={ref}
+						value={displayValue}
+						{...props}
+					/>
+				</span>
+			);
+		}
+
+		return (
+			<input
+				className={cx('pds-input', className)}
+				onChange={onChange}
+				ref={ref}
+				value={displayValue}
+				{...props}
+			/>
+		);
+	},
+);
 
 Input.displayName = 'Input';
 

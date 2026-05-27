@@ -1209,6 +1209,29 @@
 	box-shadow: 0 0 0 3px rgb(var(--theme-primary-rgb) / 0.14);
 }
 
+.pds-input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.pds-input__prefix {
+	position: absolute;
+	left: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	font-weight: 600;
+	font-size: 0.875rem;
+	line-height: 1;
+	color: var(--theme-foreground-muted);
+	z-index: 1;
+}
+
+.pds-input--with-prefix {
+	padding-left: 2rem;
+}
+
 .pds-textarea {
 	min-height: 6.5rem;
 	padding-top: 0.75rem;
