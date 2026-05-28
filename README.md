@@ -7,6 +7,14 @@ system. The Pikaboo tenant product name is `PIKABOO`. The Primedia tenant
 product name is `Cortexx`, so tenant-facing Pikaboo product references should
 render as `Cortexx` under the Primedia theme.
 
+## Documentation
+
+| Topic | File |
+|-------|------|
+| React & JSX component exports, subpath entrypoints | [docs/react-jsx-exports.md](docs/react-jsx-exports.md) |
+| Design patterns, theming, testing, component conventions | [docs/design-patterns.md](docs/design-patterns.md) |
+| Known a11y and design issues, workarounds | [docs/common-issues.md](docs/common-issues.md) |
+
 ## Authenticate npm with the timbuk2 CodeArtifact registry
 
 The `timbuk2` CodeArtifact registry is in eu-west-1 because CodeArtifact has no

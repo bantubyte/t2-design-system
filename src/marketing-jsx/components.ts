@@ -1874,7 +1874,7 @@ export function RawFooter({
 export type RawThemeToggleMode = 'dark' | 'light';
 
 const RAW_THEME_STORAGE_DEFAULT = 'pikaboo:website:theme';
-const RAW_THEME_FOR_MODE: Record<RawThemeToggleMode, string> = {
+const _RAW_THEME_FOR_MODE: Record<RawThemeToggleMode, string> = {
 	dark: 'pikaboo-dark',
 	light: 'pikaboo',
 };

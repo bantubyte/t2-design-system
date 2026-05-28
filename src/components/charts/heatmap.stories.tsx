@@ -60,6 +60,14 @@ export const AllVariants: Story = {
 			/>
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /attention score/i }),
+		).toBeVisible();
+		await expect(
+			canvas.getByRole('img', { name: /daily site activity/i }),
+		).toBeVisible();
+	},
 };
 
 export const Empty: Story = {
@@ -69,6 +77,9 @@ export const Empty: Story = {
 			<Heatmap {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('No chart data available.')).toBeVisible();
+	},
 };
 
 export const Loading: Story = {
@@ -78,6 +89,11 @@ export const Loading: Story = {
 			<Heatmap {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('status', { name: /loading chart/i }),
+		).toBeVisible();
+	},
 };
 
 export const ErrorState: Story = {
@@ -87,6 +103,11 @@ export const ErrorState: Story = {
 			<Heatmap {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByText('Unable to load heatmap data.'),
+		).toBeVisible();
+	},
 };
 
 export const A11yTableFallback: Story = {
@@ -96,4 +117,9 @@ export const A11yTableFallback: Story = {
 			<Heatmap {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /attention score/i }),
+		).toBeVisible();
+	},
 };

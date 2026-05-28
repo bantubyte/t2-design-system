@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect } from 'storybook/test';
 import { ThemeToggle, type ThemeToggleMode } from './theme-toggle';
 
 const meta = {
@@ -29,6 +30,9 @@ export const Playground: Story = {
 		applyToDocument: false,
 		persistKey: false as unknown as string,
 	},
+	play: async ({ canvas }) => {
+		await expect(canvas.getByRole('button', { name: /dark/i })).toBeVisible();
+	},
 };
 
 export const Light: Story = {
@@ -37,6 +41,9 @@ export const Light: Story = {
 		applyToDocument: false,
 		persistKey: false as unknown as string,
 	},
+	play: async ({ canvas }) => {
+		await expect(canvas.getByRole('button', { name: /light/i })).toBeVisible();
+	},
 };
 
 export const Dark: Story = {
@@ -44,6 +51,9 @@ export const Dark: Story = {
 		defaultValue: 'dark',
 		applyToDocument: false,
 		persistKey: false as unknown as string,
+	},
+	play: async ({ canvas }) => {
+		await expect(canvas.getByRole('button', { name: /dark/i })).toBeVisible();
 	},
 };
 
@@ -62,6 +72,10 @@ export const Controlled: Story = {
 			</div>
 		);
 	},
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText(/current mode/)).toBeVisible();
+		await expect(canvas.getByRole('button', { name: /dark/i })).toBeVisible();
+	},
 };
 
 export const CustomLabels: Story = {
@@ -72,5 +86,13 @@ export const CustomLabels: Story = {
 		lightLabel: 'Day mode',
 		applyToDocument: false,
 		persistKey: false as unknown as string,
+	},
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('button', { name: /night mode/i }),
+		).toBeVisible();
+		await expect(
+			canvas.getByRole('button', { name: /day mode/i }),
+		).toBeVisible();
 	},
 };

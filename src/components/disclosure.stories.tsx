@@ -31,7 +31,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Planning rules')).toBeVisible();
+		await expect(canvas.getByText('Reporting cadence')).toBeVisible();
+	},
+};
 
 export const MultipleOpen: Story = {
 	args: { defaultOpenItems: ['planning'], multiple: true },
@@ -63,5 +68,8 @@ export const DisclosureToggle: Story = {
 			);
 		}
 		return <Toggle />;
+	},
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Advanced filters')).toBeVisible();
 	},
 };

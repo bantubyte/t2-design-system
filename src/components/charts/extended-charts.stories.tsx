@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 import { BoxPlot } from './box-plot';
 import { ComboChart } from './combo-chart';
 import { FunnelChart } from './funnel-chart';
@@ -172,6 +173,12 @@ export const AllVariants: Story = {
 			<Gauge label="Model confidence" value={78} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /spend and visits combo chart/i }),
+		).toBeVisible();
+		await expect(canvas.getByText('Model confidence')).toBeVisible();
+	},
 };
 
 export const Playground: Story = AllVariants;

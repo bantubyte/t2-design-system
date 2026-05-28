@@ -57,6 +57,10 @@ export const AllVariants: Story = {
 			<ProgressCircle label="Confidence" value={0.76} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('2.6M')).toBeVisible();
+		await expect(canvas.getByText('Incremental visits')).toBeVisible();
+	},
 };
 
 export const Empty: Story = {
@@ -66,6 +70,9 @@ export const Empty: Story = {
 			<KpiCard {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('—')).toBeVisible();
+	},
 };
 
 export const Loading: Story = Playground;
@@ -83,4 +90,7 @@ export const RealisticPrimediaData: Story = {
 			<KpiCard {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('1.9M')).toBeVisible();
+	},
 };

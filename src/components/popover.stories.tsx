@@ -32,7 +32,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('button', { name: /markets/i }),
+		).toBeVisible();
+	},
+};
 
 export const OpensAndExposesPanel: Story = {
 	args: {

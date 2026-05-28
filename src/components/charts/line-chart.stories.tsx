@@ -62,6 +62,11 @@ export const AllVariants: Story = {
 			<LineChart {...args} palette="colorblind" />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getAllByRole('img', { name: /monthly campaign reach/i }),
+		).toHaveLength(4);
+	},
 };
 
 export const Empty: Story = {
@@ -74,6 +79,11 @@ export const Empty: Story = {
 			<LineChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByText('No reach data for the selected campaign window.'),
+		).toBeVisible();
+	},
 };
 
 export const Loading: Story = {
@@ -83,6 +93,11 @@ export const Loading: Story = {
 			<LineChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('status', { name: /loading chart/i }),
+		).toBeVisible();
+	},
 };
 
 export const ErrorState: Story = {
@@ -92,6 +107,11 @@ export const ErrorState: Story = {
 			<LineChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByText('Insights service did not return trend data.'),
+		).toBeVisible();
+	},
 };
 
 export const RealisticPikabooData: Story = Playground;
@@ -112,6 +132,11 @@ export const RealisticPrimediaData: Story = {
 			<LineChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /monthly campaign reach/i }),
+		).toBeVisible();
+	},
 };
 
 export const Themed: Story = {
@@ -124,6 +149,11 @@ export const Themed: Story = {
 			))}
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getAllByRole('img', { name: /monthly campaign reach/i }),
+		).toHaveLength(3);
+	},
 };
 
 export const KeyboardNavigation: Story = Playground;
@@ -135,4 +165,9 @@ export const A11yTableFallback: Story = {
 			<LineChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /monthly campaign reach/i }),
+		).toBeVisible();
+	},
 };

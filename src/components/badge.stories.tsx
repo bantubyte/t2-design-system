@@ -34,7 +34,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Active')).toBeVisible();
+	},
+};
 
 export const Tones: Story = {
 	render: () => (
@@ -48,6 +52,20 @@ export const Tones: Story = {
 			<Badge tone="info">Insight</Badge>
 		</div>
 	),
+	play: async ({ canvas }) => {
+		const labels = [
+			'Neutral',
+			'Brand',
+			'Accent',
+			'Ready',
+			'Review',
+			'Blocked',
+			'Insight',
+		];
+		for (const label of labels) {
+			await expect(canvas.getByText(label)).toBeVisible();
+		}
+	},
 };
 
 export const Removable: Story = {
@@ -58,6 +76,11 @@ export const Removable: Story = {
 			<RemovableBadge label="KwaZulu-Natal" tone="info" />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Gauteng')).toBeVisible();
+		await expect(canvas.getByText('Western Cape')).toBeVisible();
+		await expect(canvas.getByText('KwaZulu-Natal')).toBeVisible();
+	},
 };
 
 export const Selection: Story = {
@@ -71,6 +94,9 @@ export const Selection: Story = {
 			/>
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Gauteng')).toBeVisible();
+	},
 };
 
 // pds-badge has border-radius: 999px — fails if styles.css did not load through
