@@ -1,6 +1,6 @@
 {
 	"name": "@pikaboo/t2-design-system",
-	"version": "1.4.1",
+	"version": "1.5.0",
 	"description": "Pikaboo design system tokens, themes, and React components.",
 	"type": "module",
 	"private": false,

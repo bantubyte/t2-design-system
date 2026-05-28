@@ -1217,15 +1217,15 @@
 
 .pds-input__prefix {
 	position: absolute;
-	left: 0.75rem;
 	top: 50%;
-	transform: translateY(-50%);
-	pointer-events: none;
-	font-weight: 600;
+	left: 0.75rem;
+	z-index: 1;
 	font-size: 0.875rem;
+	font-weight: 600;
 	line-height: 1;
 	color: var(--theme-foreground-muted);
-	z-index: 1;
+	pointer-events: none;
+	transform: translateY(-50%);
 }
 
 .pds-input--with-prefix {

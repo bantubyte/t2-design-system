@@ -46,16 +46,15 @@ export function Field({
 	);
 }
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+	extends Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
 	prefix?: ReactNode;
 	formatValue?: (raw: string) => string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
 	({ className, formatValue, onChange, prefix, value, ...props }, ref) => {
-		const displayValue = formatValue
-			? formatValue(String(value ?? ''))
-			: value;
+		const displayValue = formatValue ? formatValue(String(value ?? '')) : value;
 
 		if (prefix) {
 			return (
