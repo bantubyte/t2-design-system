@@ -7,7 +7,9 @@ import {
 	type ReactNode,
 	type SelectHTMLAttributes,
 	type TextareaHTMLAttributes,
+	useEffect,
 	useId,
+	useRef,
 	useState,
 } from 'react';
 import { cx } from '../utils/class-names';
@@ -138,6 +140,65 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
 );
 
 Switch.displayName = 'Switch';
+
+export interface CheckboxProps
+	extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+	label?: ReactNode;
+	/**
+	 * Tri-state: renders a dash and sets the input's `indeterminate` DOM property
+	 * (a property, not an attribute, so it must be set imperatively). Purely
+	 * visual — the underlying `checked` value is unchanged. Used for "some but not
+	 * all descendants selected" in hierarchical selectors.
+	 */
+	indeterminate?: boolean;
+}
+
+/**
+ * A labelled checkbox with checked / indeterminate / disabled states. Mirrors
+ * {@link Switch}: a visually-hidden native input drives state, a sibling box
+ * renders the check/dash glyph via CSS sibling selectors, so it stays fully
+ * accessible and form-associable.
+ */
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+	({ className, indeterminate = false, label, ...props }, ref) => {
+		const innerRef = useRef<HTMLInputElement | null>(null);
+
+		// `indeterminate` has no HTML attribute — set it on the DOM node.
+		useEffect(() => {
+			if (innerRef.current) innerRef.current.indeterminate = indeterminate;
+		}, [indeterminate]);
+
+		return (
+			<label className={cx('pds-checkbox', className)}>
+				<input
+					className="pds-checkbox__input"
+					ref={(node) => {
+						innerRef.current = node;
+						if (typeof ref === 'function') ref(node);
+						else if (ref) ref.current = node;
+					}}
+					type="checkbox"
+					{...props}
+				/>
+				<span aria-hidden="true" className="pds-checkbox__box">
+					<svg className="pds-checkbox__check" fill="none" viewBox="0 0 16 16">
+						<path
+							d="M13 4.5 6.5 11 3 7.5"
+							stroke="currentColor"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+						/>
+					</svg>
+					<span className="pds-checkbox__dash" />
+				</span>
+				{label ? <span className="pds-checkbox__label">{label}</span> : null}
+			</label>
+		);
+	},
+);
+
+Checkbox.displayName = 'Checkbox';
 
 const zarCurrencyFormatter = new Intl.NumberFormat('en-ZA', {
 	currency: 'ZAR',
