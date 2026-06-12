@@ -1973,7 +1973,6 @@
 	display: inline-flex;
 	gap: 0.5rem;
 	align-items: center;
-	cursor: pointer;
 }
 
 .pds-checkbox__input {
@@ -2040,6 +2039,16 @@
 
 .pds-checkbox__input:disabled + .pds-checkbox__box {
 	opacity: 0.5;
+}
+
+.pds-checkbox__box,
+.pds-checkbox__label {
+	cursor: pointer;
+}
+
+.pds-checkbox__input:disabled + .pds-checkbox__box,
+.pds-checkbox__input:disabled ~ .pds-checkbox__label {
+	cursor: default;
 }
 
 .pds-checkbox__label {

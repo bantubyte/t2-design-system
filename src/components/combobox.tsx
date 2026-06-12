@@ -124,15 +124,16 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 							clampedActive >= 0 ? `${listId}-${clampedActive}` : undefined
 						}
 						aria-autocomplete="list"
-						aria-controls={panelOpen ? listId : undefined}
+						aria-controls={
+							panelOpen && options.length > 0 && !isLoading ? listId : undefined
+						}
 						aria-expanded={panelOpen}
 						className={cx(
 							'pds-input pds-combobox__input',
 							Boolean(prefix) && 'pds-input--with-prefix',
 						)}
 						onBlur={(event) => {
-							// Delay close so an option mousedown registers before blur.
-							setTimeout(() => setOpen(false), 120);
+							setOpen(false);
 							onBlur?.(event);
 						}}
 						onChange={(event) => {
@@ -177,6 +178,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 										}}
 										onMouseEnter={() => setActiveIndex(index)}
 										role="option"
+										tabIndex={-1}
 										type="button"
 									>
 										<span className="pds-combobox__option-label">

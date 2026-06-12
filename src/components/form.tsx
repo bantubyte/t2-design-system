@@ -174,6 +174,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 					className="pds-checkbox__input"
 					ref={(node) => {
 						innerRef.current = node;
+						if (node) node.indeterminate = indeterminate;
 						if (typeof ref === 'function') ref(node);
 						else if (ref) ref.current = node;
 					}}
