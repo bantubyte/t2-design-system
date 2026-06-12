@@ -48,6 +48,11 @@ export const AllVariants: Story = {
 			<PieChart {...args} palette="colorblind" />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getAllByRole('img', { name: /inventory mix/i }),
+		).toHaveLength(3);
+	},
 };
 
 export const Empty: Story = {
@@ -57,6 +62,9 @@ export const Empty: Story = {
 			<PieChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('No chart data available.')).toBeVisible();
+	},
 };
 
 export const Loading: Story = {
@@ -66,6 +74,11 @@ export const Loading: Story = {
 			<PieChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('status', { name: /loading chart/i }),
+		).toBeVisible();
+	},
 };
 
 export const ErrorState: Story = {
@@ -75,6 +88,9 @@ export const ErrorState: Story = {
 			<PieChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('Unable to load mix data.')).toBeVisible();
+	},
 };
 
 export const RealisticPikabooData: Story = Playground;
@@ -92,6 +108,11 @@ export const RealisticPrimediaData: Story = {
 			<PieChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /inventory mix/i }),
+		).toBeVisible();
+	},
 };
 
 export const A11yTableFallback: Story = {
@@ -101,4 +122,9 @@ export const A11yTableFallback: Story = {
 			<PieChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /inventory mix/i }),
+		).toBeVisible();
+	},
 };
