@@ -36,7 +36,7 @@ describe('Combobox', () => {
 	it('renders an input with combobox role', () => {
 		const container = render(
 			<Combobox
-				onSelect={() => {}}
+				onOptionSelect={() => {}}
 				onValueChange={() => {}}
 				options={[]}
 				value=""
@@ -50,7 +50,7 @@ describe('Combobox', () => {
 	it('renders options when panel is open', () => {
 		const container = render(
 			<Combobox
-				onSelect={() => {}}
+				onOptionSelect={() => {}}
 				onValueChange={() => {}}
 				options={[
 					{ label: 'Option 1', value: '1' },
@@ -59,7 +59,9 @@ describe('Combobox', () => {
 				value=""
 			/>,
 		);
-		const input = container.querySelector('input')!;
+		const input = container.querySelector('input');
+		expect(input).toBeTruthy();
+		if (!input) return;
 
 		act(() => {
 			input.focus();
@@ -77,13 +79,15 @@ describe('Combobox', () => {
 			<Combobox
 				isLoading
 				loadingLabel="Loading..."
-				onSelect={() => {}}
+				onOptionSelect={() => {}}
 				onValueChange={() => {}}
 				options={[]}
 				value=""
 			/>,
 		);
-		const input = container.querySelector('input')!;
+		const input = container.querySelector('input');
+		expect(input).toBeTruthy();
+		if (!input) return;
 
 		act(() => {
 			input.focus();

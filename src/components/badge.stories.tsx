@@ -95,7 +95,14 @@ export const Selection: Story = {
 		</div>
 	),
 	play: async ({ canvas }) => {
-		await expect(canvas.getByText('Gauteng')).toBeVisible();
+		await expect(canvas.getByText('None')).toBeVisible();
+		const gautengBadges = canvas.getAllByText('Gauteng');
+		await expect(gautengBadges).toHaveLength(2);
+		for (const badge of gautengBadges) {
+			await expect(badge).toBeVisible();
+		}
+		await expect(canvas.getByText('Western Cape')).toBeVisible();
+		await expect(canvas.getByRole('button', { name: '+2' })).toBeVisible();
 	},
 };
 
