@@ -28,7 +28,7 @@ function ControlledCombobox(args: Partial<ComboboxProps>) {
 		<div style={{ maxWidth: 360 }}>
 			<Combobox
 				{...args}
-				onSelect={(option) => {
+				onOptionSelect={(option) => {
 					setValue(String(option.label));
 					setSelected(option.value);
 				}}
@@ -60,7 +60,7 @@ const meta = {
 		value: '',
 		onValueChange: () => {},
 		options: [],
-		onSelect: () => {},
+		onOptionSelect: () => {},
 		placeholder: 'Search for an address…',
 		status: 'default',
 		isLoading: false,
@@ -71,7 +71,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+	play: async ({ canvas }) => {
+		const input = canvas.getByRole('combobox');
+		await expect(input).toBeVisible();
+	},
+};
 
 export const TypeAndSelect: Story = {
 	play: async ({ canvas, userEvent }) => {

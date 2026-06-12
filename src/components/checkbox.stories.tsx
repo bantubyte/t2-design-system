@@ -33,14 +33,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+	play: async ({ canvas }) => {
+		const input = canvas.getByRole('checkbox');
+		await expect(input).toBeVisible();
+	},
+};
 
 export const Indeterminate: Story = {
 	args: { indeterminate: true },
+	play: async ({ canvas }) => {
+		const input = canvas.getByRole('checkbox');
+		await expect(input).toBePartiallyChecked();
+	},
 };
 
 export const Disabled: Story = {
 	args: { disabled: true },
+	play: async ({ canvas }) => {
+		const input = canvas.getByRole('checkbox');
+		await expect(input).toBeDisabled();
+	},
 };
 
 export const TogglesOnClick: Story = {

@@ -19,7 +19,7 @@ export type ComboboxStatus = 'default' | 'success' | 'warning' | 'danger';
 export interface ComboboxProps
 	extends Omit<
 		InputHTMLAttributes<HTMLInputElement>,
-		'value' | 'onChange' | 'onSelect' | 'prefix'
+		'value' | 'onChange' | 'prefix'
 	> {
 	/** Controlled text value of the input. */
 	value: string;
@@ -28,7 +28,7 @@ export interface ComboboxProps
 	/** Current suggestions to show. The consumer owns fetching/debouncing. */
 	options: readonly ComboboxOption[];
 	/** Fired when the user picks an option (click or Enter). */
-	onSelect: (option: ComboboxOption) => void;
+	onOptionSelect: (option: ComboboxOption) => void;
 	/** Show a loading row in the dropdown while suggestions are being fetched. */
 	isLoading?: boolean;
 	/** Border treatment for validation state. */
@@ -56,7 +56,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 			onBlur,
 			onFocus,
 			onKeyDown,
-			onSelect,
+			onOptionSelect,
 			onValueChange,
 			options,
 			prefix,
@@ -79,7 +79,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 		const choose = (index: number) => {
 			const option = options[index];
 			if (!option) return;
-			onSelect(option);
+			onOptionSelect(option);
 			setOpen(false);
 			setActiveIndex(-1);
 		};
