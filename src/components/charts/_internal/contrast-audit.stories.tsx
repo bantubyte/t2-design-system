@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 import { resolvePalette } from '../../../charts-core';
 import { ThemeProvider } from '../../../theme';
 
@@ -51,4 +52,9 @@ export const PaletteSwatches: Story = {
 			))}
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(canvas.getByText('pikaboo')).toBeVisible();
+		await expect(canvas.getByText('pikaboo-dark')).toBeVisible();
+		await expect(canvas.getByText('primedia')).toBeVisible();
+	},
 };

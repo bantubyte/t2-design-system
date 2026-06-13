@@ -6,6 +6,7 @@ export * from './button';
 export * from './calendar';
 export * from './campaign';
 export * from './card';
+export * from './combobox';
 export * from './command';
 export * from './dashboard';
 export * from './data-display';

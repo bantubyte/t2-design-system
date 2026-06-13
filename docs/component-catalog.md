@@ -18,6 +18,8 @@ Tailwind preset: `@pikaboo/t2-design-system/tailwind`
 | `Textarea` | `.pds-input.pds-textarea` | Multi-line textarea |
 | `Select` | `.pds-input.pds-select` | Native `<select>` with CSS dropdown arrow |
 | `Switch` | `.pds-switch` | Toggle switch |
+| `Checkbox` | `.pds-checkbox` | Tri-state checkbox |
+| `Combobox` | `.pds-combobox` | Controlled autocomplete input |
 | `Slider` | `.pds-slider` | Range slider with label/value display |
 | `RadioCardGroup` | `.pds-radio-card-group` | Card-style radio group (1-4 columns) |
 

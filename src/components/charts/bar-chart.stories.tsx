@@ -51,6 +51,11 @@ export const AllVariants: Story = {
 			<BarChart {...args} orientation="horizontal" />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getAllByRole('img', { name: /channel delivery/i }),
+		).toHaveLength(4);
+	},
 };
 
 export const Empty: Story = {
@@ -60,6 +65,11 @@ export const Empty: Story = {
 			<BarChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /channel delivery/i }),
+		).toBeVisible();
+	},
 };
 
 export const Loading: Story = {
@@ -69,6 +79,11 @@ export const Loading: Story = {
 			<BarChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /channel delivery/i }),
+		).toBeVisible();
+	},
 };
 
 export const ErrorState: Story = {
@@ -78,6 +93,11 @@ export const ErrorState: Story = {
 			<BarChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByText('Unable to load bar chart data.'),
+		).toBeVisible();
+	},
 };
 
 export const RealisticPikabooData: Story = Playground;
@@ -96,6 +116,11 @@ export const RealisticPrimediaData: Story = {
 			<BarChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /channel delivery/i }),
+		).toBeVisible();
+	},
 };
 
 export const KeyboardNavigation: Story = Playground;
@@ -107,4 +132,9 @@ export const A11yTableFallback: Story = {
 			<BarChart {...args} />
 		</div>
 	),
+	play: async ({ canvas }) => {
+		await expect(
+			canvas.getByRole('img', { name: /channel delivery/i }),
+		).toBeVisible();
+	},
 };
