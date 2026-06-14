@@ -126,7 +126,7 @@
 		"build:package": "npm run type-check && npm run check && npm test && npm run build",
 		"prepublishOnly": "npm run build:package",
 		"pack:check": "npm_config_cache=/private/tmp/pds-npm-cache npm pack --dry-run",
-		"artifact:login": "aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region eu-west-1",
+		"artifact:login": "aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region eu-west-1 --namespace @pikaboo",
 		"publish:artifact:dry-run": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --dry-run --access restricted",
 		"publish:artifact": "npm_config_cache=/private/tmp/pds-npm-cache npm publish --access restricted",
 		"lint": "biome lint --error-on-warnings",
@@ -137,7 +137,7 @@
 		"test": "vitest run",
 		"test:unit": "vitest --project unit run",
 		"test:storybook": "vitest --project storybook run",
-		"init-timbuk2-npm": "sh -c 'AWS_PROFILE=\"${1:?Usage: npm run init-timbuk2-npm <AWS_PROFILE>}\" exec aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region eu-west-1' init-timbuk2-npm"
+		"init-timbuk2-npm": "sh -c 'AWS_PROFILE=\"${1:?Usage: npm run init-timbuk2-npm <AWS_PROFILE>}\" exec aws codeartifact login --tool npm --domain timbuk2 --domain-owner 539247467239 --repository npm --region eu-west-1 --namespace @pikaboo' init-timbuk2-npm"
 	},
 	"peerDependencies": {
 		"react": "^18.3.0 || ^19.0.0",
