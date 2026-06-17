@@ -3373,6 +3373,7 @@
 }
 
 .pds-campaign-range-control__track {
+	--pds-range-thumb: 1rem;
 	position: relative;
 	display: block;
 	height: 1.6rem;
@@ -3387,9 +3388,38 @@
 	content: "";
 	background: linear-gradient(
 		90deg,
-		rgb(var(--theme-primary-rgb) / 0.14) 0 var(--pds-range-start),
-		var(--theme-primary) var(--pds-range-start) var(--pds-range-end),
-		rgb(var(--theme-primary-rgb) / 0.14) var(--pds-range-end) 100%
+		rgb(var(--theme-primary-rgb) / 0.14) 0
+			calc(
+				var(--pds-range-thumb) /
+				2 +
+				var(--pds-range-start) *
+				(100% - var(--pds-range-thumb)) /
+				100
+			),
+		var(--theme-primary)
+			calc(
+				var(--pds-range-thumb) /
+				2 +
+				var(--pds-range-start) *
+				(100% - var(--pds-range-thumb)) /
+				100
+			)
+			calc(
+				var(--pds-range-thumb) /
+				2 +
+				var(--pds-range-end) *
+				(100% - var(--pds-range-thumb)) /
+				100
+			),
+		rgb(var(--theme-primary-rgb) / 0.14)
+			calc(
+				var(--pds-range-thumb) /
+				2 +
+				var(--pds-range-end) *
+				(100% - var(--pds-range-thumb)) /
+				100
+			)
+			100%
 	);
 	border-radius: 999px;
 	transform: translateY(-50%);
@@ -11968,4 +11998,65 @@
 	font-size: 0.8125rem;
 	color: var(--theme-foreground-muted);
 	text-align: center;
+}
+
+/* POI bulk-add tip ------------------------------------------------------- */
+.pds-poi-tip {
+	display: flex;
+	gap: 0.5rem;
+	align-items: flex-start;
+	padding: 0.625rem 0.75rem;
+	background: var(--theme-primary-tint);
+	border: 1px solid var(--theme-border);
+	border-radius: var(--radius);
+}
+
+.pds-poi-tip__text {
+	margin: 0;
+	font-size: 0.8125rem;
+	line-height: 1.4;
+	color: var(--theme-foreground);
+}
+
+.pds-poi-tip__text strong {
+	font-weight: 800;
+	color: var(--theme-primary);
+}
+
+.pds-poi-tip__help {
+	flex-shrink: 0;
+	margin-top: 0.1rem;
+}
+
+.pds-poi-tip__icon {
+	display: inline-flex;
+	padding: 0;
+	color: var(--theme-primary);
+	cursor: help;
+	outline: none;
+	background: none;
+	border: 0;
+	border-radius: 999px;
+}
+
+.pds-poi-tip__icon:focus-visible {
+	box-shadow: 0 0 0 2px var(--theme-primary);
+}
+
+.pds-poi-tip__help .pds-tooltip__content {
+	max-width: 20rem;
+	font-weight: 600;
+	text-align: left;
+	white-space: normal;
+}
+
+.pds-poi-tip__tooltip {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.pds-poi-tip__sample {
+	font-family: var(--font-mono, ui-monospace, "SFMono-Regular", monospace);
+	font-weight: 700;
 }

@@ -350,6 +350,12 @@ export interface CampaignRangeControlProps
 	max: number;
 	min: number;
 	onValueChange?: (value: CampaignRangeValue) => void;
+	/**
+	 * Discrete values each handle snaps to (e.g. audience bracket boundaries).
+	 * When set, any change is rounded to the nearest entry, so the range can
+	 * only ever land on real bracket edges rather than arbitrary `step` ticks.
+	 */
+	snapValues?: readonly number[];
 	step?: number;
 	unit?: ReactNode;
 	value?: CampaignRangeValue;
@@ -363,11 +369,26 @@ export function CampaignRangeControl({
 	max,
 	min,
 	onValueChange,
+	snapValues,
 	step = 1,
 	unit,
 	value,
 	...props
 }: CampaignRangeControlProps) {
+	const snap = (raw: number): number => {
+		const bounded = clampNumber(raw, min, max);
+		if (!snapValues || snapValues.length === 0) return bounded;
+		let best = snapValues[0];
+		let bestDistance = Math.abs(bounded - best);
+		for (const candidate of snapValues) {
+			const distance = Math.abs(bounded - candidate);
+			if (distance < bestDistance) {
+				best = candidate;
+				bestDistance = distance;
+			}
+		}
+		return clampNumber(best, min, max);
+	};
 	const rangeId = useId();
 	const fromInputId = `${rangeId}-from`;
 	const toInputId = `${rangeId}-to`;
@@ -389,10 +410,13 @@ export function CampaignRangeControl({
 		: stringifyNode(formatValue(highValue));
 
 	const setCurrentValue = (nextValue: CampaignRangeValue) => {
+		const snapped: CampaignRangeValue = isCampaignRangeTuple(nextValue)
+			? [snap(nextValue[0]), snap(nextValue[1])]
+			: snap(nextValue);
 		if (value === undefined) {
-			setUncontrolledValue(nextValue);
+			setUncontrolledValue(snapped);
 		}
-		onValueChange?.(nextValue);
+		onValueChange?.(snapped);
 	};
 
 	return (
@@ -404,8 +428,10 @@ export function CampaignRangeControl({
 			)}
 			style={
 				{
-					'--pds-range-end': `${highPercent}%`,
-					'--pds-range-start': `${isRange ? lowPercent : 0}%`,
+					// Unitless 0–100; the CSS insets these by half a thumb so the fill
+					// lines up with the thumb centres instead of the raw track edges.
+					'--pds-range-end': highPercent,
+					'--pds-range-start': isRange ? lowPercent : 0,
 				} as CSSProperties
 			}
 			{...props}
@@ -471,12 +497,21 @@ export function CampaignRangeControl({
 			</div>
 			{isRange ? (
 				<div className="pds-campaign-range-control__track">
+					{/*
+					 * Both handles span the full [min, max] scale so each thumb is
+					 * anchored to the same range. Crossing is prevented in the onChange
+					 * clamp — NOT via dynamic min/max attributes, which would re-anchor
+					 * (and visually shift) the opposite thumb when this one moves.
+					 */}
 					<input
 						aria-label={`${stringifyNode(label)} minimum`}
-						max={highValue}
+						max={max}
 						min={min}
 						onChange={(event) =>
-							setCurrentValue([Number(event.target.value), highValue])
+							setCurrentValue([
+								Math.min(Number(event.target.value), highValue),
+								highValue,
+							])
 						}
 						step={step}
 						type="range"
@@ -485,9 +520,12 @@ export function CampaignRangeControl({
 					<input
 						aria-label={`${stringifyNode(label)} maximum`}
 						max={max}
-						min={lowValue}
+						min={min}
 						onChange={(event) =>
-							setCurrentValue([lowValue, Number(event.target.value)])
+							setCurrentValue([
+								lowValue,
+								Math.max(Number(event.target.value), lowValue),
+							])
 						}
 						step={step}
 						type="range"

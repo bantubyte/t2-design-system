@@ -25,6 +25,7 @@ export * from './metadata';
 export * from './navigation';
 export * from './page-blocks';
 export * from './payment';
+export * from './poi';
 export * from './popover';
 export * from './report';
 export * from './selector';

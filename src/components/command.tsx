@@ -63,9 +63,12 @@ export function CommandMenu<TValue extends string = string>({
 	}, [items, normalizedQuery]);
 
 	const groupedItems = useMemo(() => {
+		// Ungrouped items collapse under a sentinel ('') so we can omit the
+		// group header entirely — otherwise a default "Commands" heading leaks
+		// to the top of single-group dropdowns (e.g. Client/Agency/Brand).
 		const groups = new Map<string, CommandMenuItem<TValue>[]>();
 		for (const item of filteredItems) {
-			const groupName = item.group ?? 'Commands';
+			const groupName = item.group ?? '';
 			const groupItems = groups.get(groupName) ?? [];
 			groupItems.push(item);
 			groups.set(groupName, groupItems);
@@ -91,8 +94,11 @@ export function CommandMenu<TValue extends string = string>({
 			<div className="pds-command-menu__list">
 				{groupedItems.length > 0 ? (
 					groupedItems.map(([groupName, groupItems]) => (
-						<section className="pds-command-menu__group" key={groupName}>
-							<h4>{groupName}</h4>
+						<section
+							className="pds-command-menu__group"
+							key={groupName || '__ungrouped__'}
+						>
+							{groupName ? <h4>{groupName}</h4> : null}
 							{groupItems.map((item) => (
 								<button
 									aria-pressed={item.value === selectedValue}

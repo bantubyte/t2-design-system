@@ -4,3 +4,4 @@ storybook-static/
 .superpowers/
 debug-storybook.log
 .DS_Store
+.claude/settings.local.json
