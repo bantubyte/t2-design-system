@@ -61,4 +61,19 @@ describe('CommandMenu', () => {
 			container.querySelector('.pds-command-menu__empty')?.textContent,
 		).toBe('No commands found');
 	});
+
+	it('omits the group header for ungrouped items', () => {
+		const ungrouped = [
+			{ label: 'No Client', value: 'none' },
+			{ label: 'Acme Media', value: 'acme' },
+		];
+		const container = render(<CommandMenu items={ungrouped} />);
+		const groups = container.querySelectorAll('.pds-command-menu__group');
+		expect(groups.length).toBe(1);
+		// No leaked "Commands" heading at the top of the dropdown.
+		expect(groups[0].querySelector('h4')).toBeNull();
+		expect(container.querySelectorAll('.pds-command-menu__item').length).toBe(
+			2,
+		);
+	});
 });
