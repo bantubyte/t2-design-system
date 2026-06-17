@@ -9,7 +9,7 @@
 		"registry": "https://timbuk2-539247467239.d.codeartifact.eu-west-1.amazonaws.com/npm/npm/"
 	},
 	"engines": {
-		"node": ">=22.14.0",
+		"node": ">=24 <25",
 		"npm": ">=10.9.0"
 	},
 	"sideEffects": [
